@@ -1,0 +1,6 @@
+{
+  "name": "MediCure Pharmacy",
+  "description": "Professional Online Pharmacy & Healthcare Store with Soft UI design, prescription upload, medicine search by formula, category filtering, order tracking, and Supabase database connectivity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
