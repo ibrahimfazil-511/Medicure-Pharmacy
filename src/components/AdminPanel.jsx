@@ -171,11 +171,11 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f4f8] p-4 sm:p-6 lg:p-8 font-sans text-slate-800 relative">
+    <div className="soft-canvas min-h-screen p-3 sm:p-6 lg:p-8 font-sans text-slate-800 relative">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Top Header Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white/85 backdrop-blur-md p-5 rounded-3xl shadow-sm border border-slate-100 gap-4">
+        <div className="soft-card flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white/85 backdrop-blur-md p-4 sm:p-5 rounded-2xl gap-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center shadow-inner">
               <ShieldCheck className="w-6 h-6" />
@@ -186,16 +186,16 @@ export default function AdminPanel() {
             </div>
           </div>
           
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
+              className="flex flex-1 sm:flex-initial justify-center items-center gap-2 px-3 sm:px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Store
             </button>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition border border-rose-100"
+              className="flex flex-1 sm:flex-initial justify-center items-center gap-2 px-3 sm:px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition border border-rose-100"
             >
               <LogOut className="w-4 h-4" /> Logout
             </button>
@@ -366,8 +366,16 @@ export default function AdminPanel() {
 
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                      <Upload className="w-3 h-3 text-teal-600" /> Upload Medicine Image
+                      <Upload className="w-3 h-3 text-teal-600" /> Product Image
                     </label>
+                    <input
+                      type="url"
+                      placeholder="Paste image URL (https://...)"
+                      value={newMed.image_url}
+                      onChange={(e) => setNewMed({ ...newMed, image_url: e.target.value })}
+                      className="w-full px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs outline-none text-slate-800"
+                    />
+                    <p className="text-[10px] text-slate-500">Use an image URL or choose an image from your folder.</p>
                     <input
                       type="file"
                       accept="image/*"
@@ -375,7 +383,17 @@ export default function AdminPanel() {
                       className="w-full px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 text-xs text-slate-800 file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
                     />
                     {uploading && <p className="text-[10px] text-teal-600 font-bold mt-1">Uploading image...</p>}
-                    {newMed.image_url && <p className="text-[10px] text-emerald-600 font-bold mt-1 truncate">Image available/uploaded!</p>}
+                    {newMed.image_url && (
+                      <div className="mt-2 flex items-center gap-3 rounded-xl border border-teal-100 bg-teal-50/60 p-2">
+                        <img
+                          src={newMed.image_url}
+                          alt="Selected product preview"
+                          className="h-14 w-14 rounded-lg object-cover border border-white shadow-sm"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                        <p className="text-[10px] text-emerald-700 font-bold truncate">Image ready to save</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -591,7 +609,7 @@ export default function AdminPanel() {
       {/* Image Preview Modal */}
       {selectedImage && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white p-4 rounded-3xl max-w-2xl w-full relative shadow-2xl space-y-3">
+          <div className="soft-card bg-white p-4 rounded-2xl max-w-2xl w-full relative shadow-2xl space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-slate-700 truncate max-w-[90%] font-mono">{selectedImage}</h3>
               <button 
@@ -611,7 +629,7 @@ export default function AdminPanel() {
       {/* Inquiry Details Modal */}
       {selectedInquiry && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-3xl max-w-lg w-full relative shadow-2xl space-y-4">
+          <div className="soft-card bg-white p-6 rounded-2xl max-w-lg w-full relative shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-sm font-black text-slate-900">Inquiry #{selectedInquiry.id}</h3>

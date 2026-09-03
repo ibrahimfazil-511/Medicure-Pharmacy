@@ -78,7 +78,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="soft-card w-full max-w-xl bg-[#f0f4f8] p-4 sm:p-8 relative border border-white max-h-[90vh] overflow-y-auto">
+      <div className="soft-card w-full max-w-xl bg-[#f4f8f8] p-4 sm:p-8 relative border border-white max-h-[90vh] overflow-y-auto">
         
         {!submittedRx ? (
           <div>

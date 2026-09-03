@@ -11,11 +11,11 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-100 text-slate-700 pt-16 pb-8 border-t border-slate-200">
+    <footer className="bg-[#eaf3f3] text-slate-700 pt-10 sm:pt-16 pb-8 border-t border-[#d9e6e7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Main Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-slate-300 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 pb-10 sm:pb-12 border-b border-slate-300 items-start">
           
           {/* Column 1: Brand Info & License Badge */}
           <div className="flex flex-col gap-4">
@@ -54,23 +54,23 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2.5 text-sm font-medium">
               <li>
-                <a href="#shop-section" className="hover:text-teal-600 transition flex items-center gap-1">
-                  <span className="text-slate-400">›</span> Shop by Category
+                <a href="/" className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
+                  <span className="text-teal-500">›</span> Shop by Category
                 </a>
               </li>
               <li>
-                <a href="#prescription-section" className="hover:text-teal-600 transition flex items-center gap-1">
-                  <span className="text-slate-400">›</span> Prescription Upload
+                <a href="#prescription-upload" className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
+                  <span className="text-teal-500">›</span> Prescription Upload
                 </a>
               </li>
               <li>
-                <a href="#track-section" className="hover:text-teal-600 transition flex items-center gap-1">
-                  <span className="text-slate-400">›</span> Track Order Status
+                <a href="#track-order" className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
+                  <span className="text-teal-500">›</span> Track Order Status
                 </a>
               </li>
               <li>
-                <a href="#contact-section" className="hover:text-teal-600 transition flex items-center gap-1">
-                  <span className="text-slate-400">›</span> Contact Us & Hotline
+                <a href="#contact-us" className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
+                  <span className="text-teal-500">›</span> Contact Us & Hotline
                 </a>
               </li>
             </ul>
@@ -154,9 +154,9 @@ export default function Footer() {
         </div>
 
         {/* Bottom Copyright & Legal Links */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 text-center sm:text-left">
           <p>© 2026 MediCure Pharmacy Ltd. All Rights Reserved.</p>
-          <div className="flex items-center gap-4 mt-3 sm:mt-0 font-medium">
+          <div className="flex items-center gap-4 font-medium">
             <a href="#privacy" className="hover:text-teal-600 transition">Privacy Policy</a>
             <span className="text-slate-300">•</span>
             <a href="#terms" className="hover:text-teal-600 transition">Terms of Service</a>

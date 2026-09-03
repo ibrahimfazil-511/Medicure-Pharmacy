@@ -88,7 +88,7 @@ export default function CategoryPage({ onAddToCart }) {
   });
 
   return (
-    <div className="min-h-screen bg-[#f0f4f8] text-slate-800 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
+    <div className="soft-canvas min-h-screen text-slate-800 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1 space-y-6">
         
         {/* Back to Home Button */}

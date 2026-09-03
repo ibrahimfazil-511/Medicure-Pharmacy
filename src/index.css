@@ -1,74 +1,132 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --clinic-ink: #123047;
+    --clinic-muted: #617487;
+    --clinic-teal: #087f78;
+    --clinic-teal-dark: #06645f;
+    --clinic-mint: #e7f7f3;
+    --clinic-canvas: #f4f8f8;
+    --clinic-line: #d9e6e7;
+    --clinic-shadow: 0 12px 30px rgba(18, 48, 71, 0.08);
+    --clinic-shadow-hover: 0 18px 38px rgba(18, 48, 71, 0.14);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   body {
-    background-color: #f8fafc;
-    color: #1e293b;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--clinic-canvas);
+    color: var(--clinic-ink);
+    font-family: "Avenir Next", "Trebuchet MS", sans-serif;
     overflow-x: hidden;
+    min-width: 320px;
+  }
+
+  #root {
+    width: 100%;
+    min-width: 0;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgba(8, 127, 120, 0.35);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: #b8ebe2;
+    color: var(--clinic-ink);
   }
 }
 
-/* Natural Tones styling helpers */
 .soft-canvas {
-  background-color: #f8fafc;
+  background-color: var(--clinic-canvas);
+  background-image: linear-gradient(135deg, rgba(231, 247, 243, 0.7), transparent 38%), linear-gradient(315deg, rgba(255, 255, 255, 0.9), transparent 42%);
 }
 
 .soft-card {
   background: #ffffff;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  border-radius: 1.5rem;
+  border: 1px solid var(--clinic-line);
+  box-shadow: var(--clinic-shadow);
+  border-radius: 1rem;
 }
 
 .soft-card-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .soft-card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-  border-color: #e2e8f0;
+  transform: translateY(-4px);
+  box-shadow: var(--clinic-shadow-hover);
+  border-color: #a9d7d4;
 }
 
 .soft-card-sm {
   background: #ffffff;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border-radius: 1rem;
+  border: 1px solid var(--clinic-line);
+  box-shadow: 0 5px 16px rgba(18, 48, 71, 0.06);
+  border-radius: 0.75rem;
 }
 
 .soft-inset {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.875rem;
+  background: #f0f7f7;
+  border: 1px solid #d7e9e8;
+  border-radius: 0.75rem;
 }
 
 .soft-inset-sm {
-  background: #f8fafc;
-  border: 1px solid #f1f5f9;
+  background: #f5f9f9;
+  border: 1px solid #e2eeee;
 }
 
 .soft-button {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
+  border: 1px solid var(--clinic-line);
+  box-shadow: 0 2px 5px rgba(18, 48, 71, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .soft-btn {
   background: #ffffff;
-  color: #334155;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--clinic-ink);
+  border: 1px solid var(--clinic-line);
+  box-shadow: 0 2px 5px rgba(18, 48, 71, 0.06);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .soft-btn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #0f172a;
+  background: #f2fbfa;
+  border-color: #9bcfcb;
+  color: var(--clinic-teal-dark);
   transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(18, 48, 71, 0.1);
 }
 
 .soft-btn:active {
@@ -76,15 +134,15 @@
 }
 
 .soft-btn-primary {
-  background-color: #0d9488;
+  background-color: var(--clinic-teal);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 7px 16px rgba(8, 127, 120, 0.22);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .soft-btn-primary:hover {
-  background-color: #0f766e;
-  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35);
+  background-color: var(--clinic-teal-dark);
+  box-shadow: 0 10px 22px rgba(8, 127, 120, 0.3);
   transform: translateY(-1px);
 }
 
@@ -93,9 +151,92 @@
 }
 
 .soft-badge {
-  background: #f0fdfa;
-  color: #0d9488;
-  border: 1px solid #ccfbf1;
+  background: var(--clinic-mint);
+  color: var(--clinic-teal-dark);
+  border: 1px solid #bce5df;
+}
+
+[class~="bg-[#f0f4f8]"] {
+  background-color: var(--clinic-canvas) !important;
+}
+
+[class*="backdrop-blur"] {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+[class*="bg-slate-900/60"] {
+  background-color: rgba(18, 48, 71, 0.68) !important;
+  animation: clinic-fade 0.24s ease both;
+}
+
+[class*="fixed inset-0"] > [class*="soft-card"],
+[class*="fixed inset-0"] > div > [class*="soft-card"] {
+  animation: clinic-dialog 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+table tbody tr {
+  transition: background-color 0.18s ease;
+}
+
+table tbody tr:hover {
+  background-color: #f2fbfa;
+}
+
+/* Keep long labels and data surfaces usable on narrow screens. */
+button,
+a,
+label,
+td,
+th {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .soft-card {
+    border-radius: 0.875rem;
+  }
+
+  [class*="fixed inset-0"] {
+    padding: 0.75rem;
+  }
+
+  [class*="fixed inset-0"] > [class*="max-h-"] {
+    max-height: calc(100dvh - 1.5rem);
+  }
+
+  table {
+    font-size: 0.6875rem;
+  }
+}
+
+/* Shared presentation hooks used by the existing JSX surfaces. */
+.animate-in {
+  animation: clinic-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.clinic-hero {
+  animation: clinic-rise 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.clinic-stagger > * {
+  animation: clinic-rise 0.5s ease both;
+}
+
+.clinic-stagger > :nth-child(2) { animation-delay: 70ms; }
+.clinic-stagger > :nth-child(3) { animation-delay: 140ms; }
+.clinic-stagger > :nth-child(4) { animation-delay: 210ms; }
+
+.soft-card,
+.soft-card-sm {
+  animation: clinic-rise 0.5s ease both;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #7bc3bd !important;
+  box-shadow: 0 0 0 3px rgba(8, 127, 120, 0.12);
 }
 
 /* Custom soft scrollbar */
@@ -104,14 +245,43 @@
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f8fafc;
+  background: var(--clinic-canvas);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #b6d1d2;
   border-radius: 9999px;
-  border: 2px solid #f8fafc;
+  border: 2px solid var(--clinic-canvas);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #82b5b6;
+}
+
+@keyframes clinic-enter {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes clinic-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes clinic-dialog {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes clinic-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 

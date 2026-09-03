@@ -228,7 +228,9 @@ export async function saveOrder(order) {
         address: order.shippingAddress || order.address || '',
         city: order.city || 'Lahore',
         payment_method: order.paymentMethod || 'Cash on Delivery',
-        tracking_code: order.trackingId || null
+        tracking_code: order.trackingId || null,
+        subtotal: Number(order.subtotal || 0),
+        shipping_fee: Number(order.shippingFee || 0)
       }
     };
 

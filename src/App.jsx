@@ -462,7 +462,7 @@ function StoreFront({
   }, [medicines, searchQuery, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-[#f0f4f8] text-slate-800 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
+    <div className="soft-canvas min-h-screen text-slate-800 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
 
       {/* Top Navigation Bar */}
       <Navbar
@@ -482,10 +482,10 @@ function StoreFront({
       <main className="flex-1">
 
         {/* Soft UI Hero Banner */}
-        <section className="relative pt-8 pb-12 overflow-hidden bg-gradient-to-b from-[#f0f4f8] via-[#e6edf5] to-[#f0f4f8]">
+        <section className="relative pt-8 pb-12 overflow-hidden bg-gradient-to-b from-[#eef8f7] via-white to-[#f4f8f8]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="soft-card p-6 sm:p-10 border border-white/90 relative overflow-hidden">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="soft-card clinic-hero p-4 sm:p-10 border border-white/90 relative overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 items-center">
 
                 <div className="lg:col-span-7 space-y-5">
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-teal-100/80 text-teal-900 soft-badge">
@@ -493,7 +493,7 @@ function StoreFront({
                     <span>Your Trusted 24/7 Digital Health Partner</span>
                   </div>
 
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight tracking-tight">
+                  <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight tracking-tight">
                     Order Genuine Medicines & <span className="text-teal-700">Generic Formulas</span> Delivered Fast
                   </h1>
 
@@ -501,7 +501,7 @@ function StoreFront({
                     Search top pharmaceutical brands by medicine name or exact chemical formula. Upload your prescription for instant verification by qualified pharmacists.
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  <div className="clinic-stagger grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                     <div className="p-3 rounded-2xl soft-inset bg-slate-100/80 text-xs font-bold text-slate-800 flex items-center gap-2">
                       <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
                       <span>100% Authentic Medicines</span>
@@ -513,10 +513,10 @@ function StoreFront({
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3 pt-3">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
                     <button
                       onClick={() => setIsPrescriptionOpen(true)}
-                      className="soft-btn-primary px-6 py-3 rounded-2xl font-bold text-sm shadow-xl flex items-center gap-2"
+                      className="soft-btn-primary w-full sm:w-auto justify-center px-6 py-3 rounded-2xl font-bold text-sm shadow-xl flex items-center gap-2"
                     >
                       <FileText className="w-4 h-4" />
                       <span>Upload Prescription Now</span>
@@ -524,7 +524,7 @@ function StoreFront({
 
                     <button
                       onClick={() => setIsTrackOrderOpen(true)}
-                      className="soft-btn px-5 py-3 rounded-2xl font-bold text-sm text-slate-800 hover:text-teal-700 flex items-center gap-2"
+                      className="soft-btn w-full sm:w-auto justify-center px-5 py-3 rounded-2xl font-bold text-sm text-slate-800 hover:text-teal-700 flex items-center gap-2"
                     >
                       <Truck className="w-4 h-4 text-teal-600" />
                       <span>Track Active Order</span>
@@ -533,7 +533,7 @@ function StoreFront({
                 </div>
 
                 <div className="lg:col-span-5 flex justify-center">
-                  <div className="w-full max-w-md p-6 rounded-3xl soft-card bg-slate-100/90 border border-white space-y-4 shadow-2xl relative">
+                  <div className="w-full max-w-md p-6 rounded-2xl soft-card bg-white/90 border border-white space-y-4 shadow-2xl relative">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-extrabold text-teal-800 uppercase tracking-wider flex items-center gap-1.5">
                         <Pill className="w-4 h-4 text-teal-600" /> Instant Medicine Finder
@@ -573,9 +573,9 @@ function StoreFront({
         </section>
 
         {/* All Products & Medicines Grid Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-black text-slate-900">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 clinic-hero">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
               {selectedCategory ? `Showing: ${selectedCategory}` : 'All Products & Medicines'}
             </h2>
             <span className="text-xs font-bold text-slate-500">
@@ -598,12 +598,12 @@ function StoreFront({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="clinic-stagger grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredMedicines.map((medicine) => (
                 <MedicineCard
                   key={medicine.id}
                   medicine={medicine}
-                  onSelect={(med) => setSelectedMedicine(med)}
+                  onQuickView={(med) => setSelectedMedicine(med)}
                   onAddToCart={(med) => onAddToCart(med)}
                 />
               ))}
@@ -612,6 +612,37 @@ function StoreFront({
         </section>
 
       </main> 
+
+      {/* Promotional Offers Section */}
+      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+        <h2 className="text-2xl font-black text-slate-900 mb-6">Special Offers & Discounts</h2>
+        
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 clinic-stagger">
+          <div className="relative h-[190px] sm:h-[250px] lg:h-[300px] overflow-hidden rounded-2xl group cursor-pointer shadow-[0_14px_32px_rgba(18,48,71,0.12)]">
+            <img
+              src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSMall%2520Banner%2520Sunscreen.jpeg&w=1400&q=75"
+              alt="Sunscreen and personal care promotion"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              loading="lazy"
+            />
+          </div>
+
+          <div className="relative h-[190px] sm:h-[250px] lg:h-[300px] overflow-hidden rounded-2xl group cursor-pointer shadow-[0_14px_32px_rgba(18,48,71,0.12)]">
+            <img
+              src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSmall%2520Banner%2520Multivitamins%2520.jpeg&w=1400&q=75"
+              alt="Over the counter medicines promotion"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#087f78]/85 via-[#087f78]/30 to-transparent" />
+            <div className="absolute inset-y-0 left-0 flex flex-col justify-center p-5 sm:p-8 text-white max-w-[70%]">
+              <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-emerald-100"></span>
+              <h3 className="text-xl sm:text-3xl font-black leading-tight mt-1"></h3>
+              <p className="text-xs sm:text-sm font-semibold text-white/85 mt-2"></p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Modals & Drawers */}
       <MedicineDetailModal
@@ -701,7 +732,8 @@ export default function App() {
   const totalCartCount = cartItems.length;
 
   return (
-    <Router>
+    /* YAHAN BASENAME ADD KIYA GAYA HAI */
+    <Router basename="/Medicure-Pharmacy">
       <Routes>
         <Route 
           path="/" 

@@ -109,11 +109,11 @@ export default function SearchBarAndFilters({
   const TagIcon = currentConfig.icon;
 
   return (
-    <div id="shop-categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 space-y-6">
+    <div id="shop-categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 space-y-6 clinic-hero">
       
       {/* Soft UI Search Bar */}
       <div className="soft-card p-4 sm:p-6 border border-white/90 relative">
-        <div className="relative flex items-center">
+        <div className="relative flex items-center min-w-0">
           
           <div className="absolute left-4 pointer-events-none text-teal-600">
             <Search className="w-6 h-6" />
@@ -124,7 +124,7 @@ export default function SearchBarAndFilters({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={currentConfig.placeholder}
-            className="w-full pl-13 pr-12 py-4 text-sm sm:text-base font-semibold text-slate-800 placeholder-slate-400 bg-[#e8eef5] rounded-2xl soft-inset focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+            className="w-full min-w-0 pl-12 pr-12 py-3.5 sm:py-4 text-sm sm:text-base font-semibold text-slate-800 placeholder-slate-400 bg-[#e8eef5] rounded-2xl soft-inset focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
           />
 
           {searchQuery && (
@@ -161,7 +161,7 @@ export default function SearchBarAndFilters({
 
       {/* Category Pills Header & Buttons */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-teal-600" />
             <h3 className="text-lg font-extrabold text-slate-800">

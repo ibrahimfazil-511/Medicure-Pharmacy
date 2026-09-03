@@ -32,31 +32,6 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
   const rxItems = cartItems.filter(item => item.medicine.requiresPrescription);
   const hasRx = rxItems.length > 0;
 
-  const buildCustomerWhatsAppLink = (order) => {
-    const rawPhone = order.phone || '';
-    if (!rawPhone) return null;
-
-    let cleanPhone = rawPhone.replace(/[^\d+]/g, '');
-    if (cleanPhone.startsWith('+')) cleanPhone = cleanPhone.substring(1);
-    if (cleanPhone.startsWith('03') && cleanPhone.length === 11) {
-      cleanPhone = '92' + cleanPhone.substring(1);
-    } else if (cleanPhone.startsWith('3') && cleanPhone.length === 10) {
-      cleanPhone = '92' + cleanPhone;
-    }
-
-    const trackingCode = order.trackingId || `MED-${order.id || 'ORDER'}`;
-    const itemList = (order.items || []).map((item) => {
-      const itemName = item.medicine?.name || item.name || 'Medicine Item';
-      const itemPrice = Number(item.medicine?.price || item.price || 0);
-      const itemQty = Number(item.quantity || 1);
-      return `- ${itemName} (${itemQty}x @ PKR ${itemPrice.toFixed(2)})`;
-    }).join('\n') || '- No item details available';
-
-    const message = `Hello ${order.customerName || 'Customer'},\n\nYour order has been confirmed successfully.\n\nOrder Tracking ID: ${trackingCode}\nCustomer Name: ${order.customerName || 'N/A'}\nDelivery Address: ${order.shippingAddress || order.address || 'N/A'}, ${order.city || 'N/A'}\nDelivery Charges: PKR ${Number(order.shippingFee || 0).toFixed(2)}\nTotal Amount: PKR ${Number(order.total || 0).toFixed(2)}\nPayment Method: ${order.paymentMethod || 'Cash on Delivery'}\n\nItems Ordered:\n${itemList}\n\nPlease keep this tracking ID for order updates.`;
-
-    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-  };
-
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (cartItems.length === 0) return;
@@ -103,11 +78,6 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
     onClearCart();
 
     try {
-      const waLink = buildCustomerWhatsAppLink(finalizedOrder);
-      if (waLink) {
-        window.open(waLink, '_blank', 'noopener,noreferrer');
-      }
-
       confetti({
         particleCount: 80,
         spread: 70,
@@ -126,14 +96,14 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md soft-card bg-[#f0f4f8] p-6 flex flex-col justify-between relative border-l border-white overflow-y-auto">
+      <div className="absolute inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
+        <div className="w-screen max-w-md soft-card bg-[#f4f8f8] p-4 sm:p-6 flex flex-col justify-between relative border-l border-white overflow-y-auto animate-in">
           
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b border-slate-300">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <ShoppingBag className="w-6 h-6 text-teal-600" />
-              <h2 className="text-lg font-extrabold text-slate-800">Your Pharmacy Cart</h2>
+              <h2 className="text-base sm:text-lg font-extrabold text-slate-800 truncate">Your Pharmacy Cart</h2>
             </div>
             <button 
               onClick={handleCloseAll}

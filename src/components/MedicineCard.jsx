@@ -7,15 +7,7 @@
 //   return (
 //     <div
 //       onClick={() => onQuickView && onQuickView(medicine)}
-//       onKeyDown={(event) => {
-//         if ((event.key === 'Enter' || event.key === ' ') && onQuickView) {
-//           event.preventDefault();
-//           onQuickView(medicine);
-//         }
-//       }}
-//       role={onQuickView ? 'button' : undefined}
-//       tabIndex={onQuickView ? 0 : undefined}
-//       className="soft-card p-4 sm:p-5 flex flex-col justify-between bg-white/90 border border-white relative group transition-all hover:shadow-lg"
+//       className="soft-card p-4 sm:p-5 flex flex-col justify-between bg-white/90 border border-white relative group transition-all hover:shadow-lg cursor-pointer"
 //     >
       
 //       {/* Top Section: Badge & Image */}
@@ -92,9 +84,12 @@
 //         </div>
 
 //         <button
-//           onClick={(e)=>{e.stopPropagation();if (onAddToCart) {
-//       onAddToCart(medicine);}
-//     }}
+//           onClick={(e) => {
+//             e.stopPropagation(); // Prevent card click from triggering detail modal
+//             if (onAddToCart) {
+//               onAddToCart(medicine); // This will add to cart AND open CartDrawer
+//             }
+//           }}
 //           className="soft-btn-primary px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition-transform"
 //         >
 //           <Plus className="w-4 h-4" />
@@ -134,25 +129,10 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
   const categoryStr = (medicine.category || '').toLowerCase();
   const isMedicine = categoryStr.includes('medicine') || categoryStr.includes('otc') || categoryStr.includes('prescription');
 
-  // Card click hone par item cart mein jaye aur cart drawer khul jaye
-  const handleCardClick = () => {
-    if (onAddToCart) {
-      onAddToCart(medicine);
-    }
-  };
-
   return (
     <div
-      onClick={handleCardClick}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          handleCardClick();
-        }
-      }}
-      role="button"
-      tabIndex={0}
-      className="soft-card p-4 sm:p-5 flex flex-col justify-between bg-white/90 border border-white relative group transition-all hover:shadow-lg cursor-pointer"
+      onClick={() => onQuickView && onQuickView(medicine)}
+      className="soft-card soft-card-hover p-4 sm:p-5 flex flex-col justify-between bg-white/95 relative group cursor-pointer"
     >
       
       {/* Top Section: Badge & Image */}
@@ -174,7 +154,7 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
 
         {/* Image Container */}
         <div 
-          className="w-full h-44 rounded-2xl soft-inset bg-[#f4f7fb] flex items-center justify-center p-4 mb-4 overflow-hidden relative"
+          className="w-full h-44 rounded-xl soft-inset bg-[#f3f9f8] flex items-center justify-center p-4 mb-4 overflow-hidden relative"
         >
           <img 
             src={medicine.imageUrl || medicine.image || 'https://via.placeholder.com/300'} 

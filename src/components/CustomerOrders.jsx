@@ -93,10 +93,25 @@ export const getWhatsAppLink = (order) => {
   const trackingCode = order.items?.shipping?.tracking_code || `MED-${order.id}`;
   const customerName = order.customer_name || 'Valued Customer';
   const status = normalizeStatus(order.status);
-  const total = parseFloat(order.total_amount || 0).toFixed(2);
-  const city = order.items?.shipping?.city || order.city || 'your area';
+  const shipping = order.items?.shipping || {};
+  const totalAmount = parseFloat(order.total_amount || 0);
+  const items = Array.isArray(order.items?.cart) ? order.items.cart : [];
+  const itemNames = items.length
+    ? items.map((item) => `${item.name || 'Item'} x${item.quantity || 1}`).join(', ')
+    : 'Item details unavailable';
+  const itemSubtotal = items.reduce(
+    (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
+    0
+  );
+  const subtotal = Number(shipping.subtotal || order.subtotal || itemSubtotal || totalAmount);
+  const deliveryFee = shipping.shipping_fee !== undefined
+    ? Number(shipping.shipping_fee)
+    : Number(order.shipping_fee || Math.max(0, totalAmount - subtotal));
+  const address = shipping.address || order.address || 'Address not provided';
+  const city = shipping.city || order.city || 'City not provided';
+  const delivery = deliveryFee > 0 ? `PKR ${deliveryFee.toFixed(2)}` : 'FREE';
 
-  const message = `Hello ${customerName}, this is MediCure Pharmacy regarding your Order #${order.id} (Tracking: ${trackingCode}).\n\n📦 Status: ${status}\n💰 Total Amount: PKR ${total}\n📍 Delivery Destination: ${city}\n\nOur team is currently preparing your order. Please reply here if you have any questions or need to send additional prescription details.`;
+  const message = `Hello ${customerName}, this is MediCure Pharmacy regarding your order.\n\nOrder ID: #${order.id}\nTracking ID: ${trackingCode}\nCustomer Name: ${customerName}\nOrder Item(s): ${itemNames}\nAddress: ${address}, ${city}\nStatus: ${status}\nSubtotal: PKR ${subtotal.toFixed(2)}\nDelivery Charges: ${delivery}\nTotal Amount: PKR ${totalAmount.toFixed(2)}\n\nOur team is currently preparing your order. Please reply here if you have any questions or need to send additional prescription details.`;
 
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 };
@@ -301,7 +316,7 @@ export default function CustomerOrders() {
       
       {/* Toast Notification Banner */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[99999] animate-in fade-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed bottom-3 left-3 right-3 sm:left-auto sm:bottom-6 sm:right-6 z-[99999] animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div
             className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl border backdrop-blur-md text-xs font-bold ${
               toast.type === 'error'
@@ -383,7 +398,7 @@ export default function CustomerOrders() {
       </div>
 
       {/* Main Table Container */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 space-y-6">
+      <div className="soft-card p-6 sm:p-8 space-y-6">
         
         {/* Header & Controls Toolbar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
@@ -734,7 +749,7 @@ export default function CustomerOrders() {
       {selectedOrder && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div 
-            className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative space-y-6 border border-slate-100 max-h-[90vh] overflow-y-auto"
+            className="soft-card bg-white rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             
