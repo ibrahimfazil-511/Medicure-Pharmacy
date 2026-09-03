@@ -11,6 +11,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
   const [dragActive, setDragActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submittedRx, setSubmittedRx] = useState(null);
+  const [submitError, setSubmitError] = useState('');
 
   if (!isOpen) return null;
 
@@ -47,6 +48,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
     }
 
     setSubmitting(true);
+    setSubmitError('');
 
     const rxRecord = {
       id: `RX-${Math.floor(100000 + Math.random() * 900000)}`,
@@ -60,8 +62,12 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
       timestamp: new Date().toLocaleString()
     };
 
-    await savePrescription(rxRecord , file);
+    const result = await savePrescription(rxRecord, file);
     setSubmitting(false);
+    if (!result?.success) {
+      setSubmitError(result?.error || 'Prescription could not be uploaded. Please try again.');
+      return;
+    }
     setSubmittedRx(rxRecord);
     if (onPrescriptionUploaded) onPrescriptionUploaded(rxRecord);
   };
@@ -73,6 +79,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
     setPatientPhone('');
     setNotes('');
     setFile(null);
+    setSubmitError('');
     onClose();
   };
 
@@ -107,6 +114,11 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {submitError && (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold">
+                  {submitError}
+                </div>
+              )}
               
               {/* Drag and Drop File Upload Area */}
               <div

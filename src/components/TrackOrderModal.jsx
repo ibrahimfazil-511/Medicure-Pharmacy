@@ -283,7 +283,7 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
               </div>
               <div className="border-t border-slate-200 mt-2 pt-2 flex items-center justify-between text-xs font-black text-slate-900">
                 <span>Total Amount:</span>
-                <span className="text-blue-600">PKR {activeOrder.total_amount?.toFixed(2)}</span>
+                <span className="text-blue-600">PKR {Number(activeOrder.total_amount || 0).toFixed(2)}</span>
               </div>
             </div>
 

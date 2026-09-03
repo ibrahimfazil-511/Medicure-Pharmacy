@@ -311,6 +311,22 @@ export default function CustomerOrders() {
     }
   };
 
+  const getOrderTotals = (order) => {
+    const shipping = order?.items?.shipping || {};
+    const cart = Array.isArray(order?.items?.cart) ? order.items.cart : [];
+    const total = Number(order?.total_amount || 0);
+    const itemSubtotal = cart.reduce(
+      (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
+      0
+    );
+    const subtotal = Number(shipping.subtotal || order?.subtotal || itemSubtotal || total);
+    const deliveryFee = shipping.shipping_fee !== undefined
+      ? Number(shipping.shipping_fee)
+      : Number(order?.shipping_fee || Math.max(0, total - subtotal));
+
+    return { subtotal, deliveryFee, total };
+  };
+
   return (
     <div className="space-y-6 font-sans">
       
@@ -954,7 +970,7 @@ export default function CustomerOrders() {
             </div>
 
             {/* Total Summary Footer */}
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div className="text-xs text-slate-400">
                 <span>Ref Tracking: </span>
                 <strong className="font-mono text-slate-700">
@@ -963,9 +979,26 @@ export default function CustomerOrders() {
               </div>
 
               <div className="text-right">
+                {(() => {
+                  const { subtotal, deliveryFee, total } = getOrderTotals(selectedOrder);
+                  return (
+                    <div className="space-y-1 mb-2 text-xs font-semibold text-slate-500">
+                      <div className="flex justify-between gap-8">
+                        <span>Subtotal</span>
+                        <span className="text-slate-700">PKR {subtotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between gap-8">
+                        <span>Delivery Charges</span>
+                        <span className={deliveryFee > 0 ? 'text-slate-700' : 'text-emerald-600'}>
+                          {deliveryFee > 0 ? `PKR ${deliveryFee.toFixed(2)}` : 'FREE'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Grand Total Paid</span>
                 <span className="text-xl font-black text-teal-800">
-                  PKR {parseFloat(selectedOrder.total_amount || 0).toFixed(2)}
+                  PKR {getOrderTotals(selectedOrder).total.toFixed(2)}
                 </span>
               </div>
             </div>

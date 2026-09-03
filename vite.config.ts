@@ -6,7 +6,7 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
-    base: '/Medicure-Pharmacy/',
+    base: process.env.VERCEL ? '/' : '/Medicure-Pharmacy/',
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

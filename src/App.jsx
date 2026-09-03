@@ -360,7 +360,7 @@
 //   );
 // }
 import React, { useState, useEffect, useMemo } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
 import CategoryNavSection from './components/CategoryNavSection.jsx';
 import SearchBarAndFilters from './components/SearchBarAndFilters.jsx';
@@ -694,6 +694,7 @@ function StoreFront({
 export default function App() {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
 
   const handleAddToCart = (medicine, qty = 1) => {
     setCartItems((prev) => {
@@ -733,7 +734,7 @@ export default function App() {
 
   return (
     /* YAHAN BASENAME ADD KIYA GAYA HAI */
-    <Router basename="/Medicure-Pharmacy">
+    <Router basename={import.meta.env.BASE_URL.replace(/\/$/, '') || undefined}>
       <Routes>
         <Route 
           path="/" 
@@ -755,7 +756,10 @@ export default function App() {
           path="/category/:categoryId" 
           element={<CategoryPage onAddToCart={handleAddToCart} />} 
         />
-        <Route path="/admin" element={<AdminPanel />} />
+        <Route
+          path="/admin"
+          element={localStorage.getItem('isAdminLoggedIn') === 'true' ? <AdminPanel /> : <Navigate to="/" replace />}
+        />
       </Routes>
 
       {/* Global Cart Drawer available on Category & Routed Pages */}
@@ -766,7 +770,12 @@ export default function App() {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveFromCart}
         onClearCart={handleClearCart}
-        onOpenPrescription={() => {}}
+        onOpenPrescription={() => setIsPrescriptionOpen(true)}
+      />
+
+      <PrescriptionUploadModal
+        isOpen={isPrescriptionOpen}
+        onClose={() => setIsPrescriptionOpen(false)}
       />
     </Router>
   );
