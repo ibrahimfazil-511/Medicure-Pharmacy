@@ -45,6 +45,24 @@ export function getSupabase() {
   return supabaseInstance;
 }
 
+export async function sendOrderEmail(orderId) {
+  try {
+    const { data, error } = await getSupabase().functions.invoke('send-order-email', {
+      body: { orderId }
+    });
+
+    if (error) {
+      console.error('[Supabase Error] Order email failed:', error);
+      return { success: false, error: error.message || 'Order email failed' };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error('[Supabase Catch Error] Order email exception:', err);
+    return { success: false, error: err.message || 'Order email failed' };
+  }
+}
+
 // Direct export of default client instance
 export const supabase = getSupabase();
 

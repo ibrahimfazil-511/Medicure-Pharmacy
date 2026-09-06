@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, ShoppingBag, Trash2, Plus, Minus, AlertTriangle, ShieldCheck, ArrowRight, CheckCircle2, Truck } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { saveOrder } from '../services/supabaseClient.js';
+import { saveOrder, sendOrderEmail } from '../services/supabaseClient.js';
 
 export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onRemoveItem, onClearCart, onOpenPrescription, onOrderCompleted }) {
   const navigate = useNavigate();
@@ -74,6 +74,14 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
       id: result.id,
       trackingId: result.trackingId || trackingId
     };
+
+    if (finalizedOrder.customerEmail) {
+      sendOrderEmail(finalizedOrder.id).then((emailResult) => {
+        if (!emailResult.success) {
+          console.warn('[CartDrawer] Order saved, but confirmation email was not sent.');
+        }
+      });
+    }
 
     setCompletedOrder(finalizedOrder);
     onClearCart();

@@ -117,8 +117,10 @@ export default function CategoryPage({ onAddToCart }) {
           </p>
         </div>
 
-        {/* Brand logos above the category search */}
-        <BrandShowcase onSelectBrand={handleBrandSelect} />
+        {/* Brand logos are relevant only to the medicines category */}
+        {categoryId === 'medicines' && (
+          <BrandShowcase onSelectBrand={handleBrandSelect} />
+        )}
 
         {/* Search Bar & Popular Formulas Panel */}
         <SearchBarAndFilters

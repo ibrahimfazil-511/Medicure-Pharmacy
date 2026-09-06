@@ -9,7 +9,7 @@ import {
   FaShieldAlt 
 } from 'react-icons/fa';
 
-export default function Footer({ onOpenAdminPortal }) {
+export default function Footer({ onOpenAdminPortal, onOpenLegal }) {
   return (
     <footer className="bg-[#eaf3f3] text-slate-700 pt-10 sm:pt-16 pb-8 border-t border-[#d9e6e7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -162,9 +162,9 @@ export default function Footer({ onOpenAdminPortal }) {
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 text-center sm:text-left">
           <p>© 2026 MediCure Pharmacy Ltd. All Rights Reserved.</p>
           <div className="flex items-center gap-4 font-medium">
-            <a href="#privacy" className="hover:text-teal-600 transition">Privacy Policy</a>
+            <button type="button" onClick={() => onOpenLegal('privacy')} className="hover:text-teal-600 transition">Privacy Policy</button>
             <span className="text-slate-300">•</span>
-            <a href="#terms" className="hover:text-teal-600 transition">Terms of Service</a>
+            <button type="button" onClick={() => onOpenLegal('terms')} className="hover:text-teal-600 transition">Terms of Service</button>
           </div>
         </div>
 

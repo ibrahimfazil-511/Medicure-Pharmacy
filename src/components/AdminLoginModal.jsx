@@ -15,10 +15,12 @@ function AdminLoginModal({ isOpen, onClose }) {
     if (accountName === 'admin' && password === 'admin123') {
       localStorage.setItem('isAdminLoggedIn', 'true');
       setError('');
+      setAccountName('');
+      setPassword('');
       onClose();
       navigate('/admin');
     } else {
-      setError('Invalid credentials! (Demo: admin / admin123)');
+      setError('Invalid credentials! Please try again.');
     }
   };
 

@@ -376,6 +376,7 @@ import AdminLoginModal from './components/AdminLoginModal.jsx';
 import CategoryPage from './components/category/CategoryPage.jsx';
 import OrderConfirmation from './components/OrderConfirmation.jsx';
 import PromoCarousel from './components/PromoCarousel.jsx';
+import LegalModal from './components/LegalModal.jsx';
 
 import { CATEGORIES } from './data/initialMedicines.js';
 import { fetchMedicines } from './services/supabaseClient.js';
@@ -411,6 +412,7 @@ function StoreFront({
   const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
   const [isTrackOrderOpen, setIsTrackOrderOpen] = useState(false);
   const [isContactUsOpen, setIsContactUsOpen] = useState(false);
+  const [legalModal, setLegalModal] = useState(null);
   const [selectedMedicine, setSelectedMedicine] = useState(null);
 
   // Load medicines on mount
@@ -685,8 +687,11 @@ function StoreFront({
         onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
         onOpenContactUs={() => setIsContactUsOpen(true)}
         onOpenAdminPortal={onOpenAdminPortal}
+        onOpenLegal={setLegalModal}
         onCategoryClick={(cat) => setSelectedCategory(cat)}
       />
+
+      <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />
 
     </div>
   );
