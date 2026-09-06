@@ -49,6 +49,12 @@ export function getSupabase() {
 export const supabase = getSupabase();
 
 function mapMedicineRow(item) {
+  const discount = Math.max(0, Number(item.discount) || 0);
+  const basePrice = Number(item.price) || 5.0;
+  const hasOriginalPrice = Number(item.original_price) > basePrice;
+  const price = hasOriginalPrice || discount === 0
+    ? basePrice
+    : Number((basePrice * (1 - discount / 100)).toFixed(2));
   return {
     id: item.id || `med-${Math.random().toString(36).substr(2, 5)}`,
     name: item.name,
@@ -56,8 +62,9 @@ function mapMedicineRow(item) {
     genericName: item.generic_name || item.formula || '',
     brand: item.brand || 'MediCure Health',
     category: (item.category || 'medicines').toLowerCase().trim(),
-    price: Number(item.price) || 5.0,
-    originalPrice: item.original_price ? Number(item.original_price) : null,
+    price,
+    originalPrice: item.original_price ? Number(item.original_price) : discount > 0 ? basePrice : null,
+    discount,
     stock: item.stock !== undefined ? item.stock : 100,
     unit: item.unit || 'Pack',
     dosageForm: item.dosage_form || 'Tablet',
@@ -129,6 +136,7 @@ export async function seedSupabaseMedicines() {
       category: m.category,
       price: m.price,
       original_price: m.originalPrice || null,
+      discount: m.discount || 0,
       stock: m.stock,
       unit: m.unit,
       dosage_form: m.dosageForm,
@@ -212,6 +220,11 @@ export async function savePrescription(prescription, fileObj) {
 export async function saveOrder(order) {
   try {
     const client = getSupabase();
+    const customerEmail = (order.customerEmail || order.customer_email || '').trim();
+    const phone = (order.phone || '').trim();
+    const hasValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail);
+    const hasValidPhone = phone.replace(/\D/g, '').length >= 10;
+    const orderStatus = hasValidPhone || hasValidEmail ? 'Pending' : 'Cancelled';
     
     const itemsPayload = {
       cart: Array.isArray(order.items) 
@@ -224,7 +237,7 @@ export async function saveOrder(order) {
           }))
         : [],
       shipping: {
-        phone: order.phone || '',
+        phone,
         address: order.shippingAddress || order.address || '',
         city: order.city || 'Lahore',
         payment_method: order.paymentMethod || 'Cash on Delivery',
@@ -236,10 +249,10 @@ export async function saveOrder(order) {
 
     const insertPayload = {
       customer_name: (order.customerName || order.customer_name || 'Guest Customer').trim(),
-      customer_email: (order.customerEmail || order.customer_email || null)?.trim() || null,
+      customer_email: customerEmail || null,
       total_amount: parseFloat(order.total || order.total_amount || 0),
       items: itemsPayload,
-      status: order.status || 'Pending'
+      status: orderStatus
     };
 
     const { data, error } = await client
@@ -278,6 +291,7 @@ CREATE TABLE IF NOT EXISTS medicines (
   category TEXT,
   price NUMERIC(10,2),
   original_price NUMERIC(10,2),
+  discount NUMERIC(5,2) DEFAULT 0,
   stock INTEGER DEFAULT 100,
   unit TEXT,
   dosage_form TEXT,
@@ -319,6 +333,7 @@ CREATE TABLE IF NOT EXISTS orders (
 
 -- 4. Enable RLS & Policies
 ALTER TABLE medicines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE medicines ADD COLUMN IF NOT EXISTS discount NUMERIC(5,2) DEFAULT 0;
 CREATE POLICY "Public Read Access for Medicines" ON medicines FOR SELECT USING (true);
 CREATE POLICY "Public Insert Access for Medicines" ON medicines FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Access for Medicines" ON medicines FOR UPDATE USING (true) WITH CHECK (true);

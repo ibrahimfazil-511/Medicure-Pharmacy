@@ -8,11 +8,12 @@ const normalizePhone = (phone) => {
   if (digits.startsWith('0092')) return digits.slice(2);
   if (digits.startsWith('92')) return digits;
   if (digits.startsWith('0')) return `92${digits.slice(1)}`;
+  if (digits.startsWith('3') && digits.length === 10) return `92${digits}`;
   return digits;
 };
 
 export default function MediCureOrderSystem({ isOpen, onClose, cartItems, customerInfo }) {
-  const [trackingInput, setTrackingInput] = useState('');
+  const [trackingInput, setTrackingInput] = useState('MED-');
   const [phoneInput, setPhoneInput] = useState(''); 
   const [activeOrder, setActiveOrder] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -82,16 +83,13 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
     }
   };
 
-  // -------------------------------------------------------------
-  // PART 2: SECURE LIVE TRACKING SEARCH (Tracking ID + Phone Verification)
-  // -------------------------------------------------------------
   const handleSearch = async (e) => {
     e.preventDefault();
     const queryId = trackingInput.trim().toUpperCase();
     const queryPhone = normalizePhone(phoneInput);
 
-    if (!queryId || !queryPhone) {
-      setErrorMessage('Please enter both Tracking ID and your Registered Phone Number.');
+    if (!/^MED-\d+$/.test(queryId) || !/^3\d{9}$/.test(phoneInput)) {
+      setErrorMessage('Enter a valid Tracking ID after MED- and exactly 10 digits after +92.');
       return;
     }
 
@@ -124,6 +122,13 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
         setErrorMessage('Invalid Tracking ID or Phone Number. Please check your details.');
       } else {
         const shipping = foundOrder.items?.shipping || {};
+        const currentStatus = foundOrder.status || foundOrder.status_text || 'Pending';
+        const normalizedStatus = String(currentStatus).toLowerCase();
+        const statusStep = normalizedStatus === 'delivered' || normalizedStatus === 'completed'
+          ? 5
+          : normalizedStatus === 'cancelled' || normalizedStatus === 'canceled'
+            ? 1
+            : foundOrder.status_step || 1;
         const formattedOrder = {
           id: shipping.tracking_code || foundOrder.id,
           customer_name: foundOrder.customer_name || shipping.name,
@@ -131,8 +136,11 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
           address: foundOrder.address || shipping.address,
           city: foundOrder.city || shipping.city,
           total_amount: foundOrder.total_amount,
-          status_step: foundOrder.status_step || 1,
+          subtotal: Number(shipping.subtotal || foundOrder.subtotal || 0),
+          delivery_fee: Number(shipping.shipping_fee ?? foundOrder.shipping_fee ?? 0),
+          status_step: statusStep,
           estimated_delivery: foundOrder.estimated_delivery || 'Tomorrow',
+          status_text: currentStatus,
           items: Array.isArray(foundOrder.items) ? foundOrder.items : (foundOrder.items?.cart || [])
         };
         
@@ -197,19 +205,26 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
               <input
                 type="text"
                 value={trackingInput}
-                onChange={(e) => setTrackingInput(e.target.value)}
-                placeholder="Tracking ID (e.g. MED-94831)..."
+                onChange={(e) => {
+                  const value = e.target.value.toUpperCase();
+                  setTrackingInput(value.startsWith('MED-') ? `MED-${value.slice(4).replace(/\D/g, '')}` : 'MED-');
+                }}
+                aria-label="Tracking number"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl soft-inset-sm text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div className="relative flex-1">
+            <div className="relative flex-1 flex items-center rounded-xl soft-inset-sm bg-white focus-within:ring-2 focus-within:ring-blue-500">
               <Phone className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
+              <span className="pl-10 pr-1 text-xs font-bold text-slate-700">+92</span>
               <input
-                type="text"
+                type="tel"
                 value={phoneInput}
-                onChange={(e) => setPhoneInput(e.target.value)}
-                placeholder="Registered Phone Number..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl soft-inset-sm text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder="3342850819"
+                maxLength={10}
+                inputMode="numeric"
+                aria-label="Phone number without country code"
+                className="min-w-0 flex-1 pr-4 py-2.5 bg-transparent text-xs font-bold text-slate-800 focus:outline-none"
               />
             </div>
           </div>
@@ -244,6 +259,11 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
                     {activeOrder.estimated_delivery}
                   </span>
                 </div>
+              </div>
+
+              <div className="flex items-center justify-between rounded-xl bg-teal-50 border border-teal-200 px-3 py-2">
+                <span className="text-[10px] uppercase font-extrabold text-teal-700">Current Order Status</span>
+                <span className="text-xs font-black text-teal-800">{activeOrder.status_text}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -282,8 +302,18 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
                 ))}
               </div>
               <div className="border-t border-slate-200 mt-2 pt-2 flex items-center justify-between text-xs font-black text-slate-900">
-                <span>Total Amount:</span>
-                <span className="text-blue-600">PKR {Number(activeOrder.total_amount || 0).toFixed(2)}</span>
+                <div className="space-y-1 font-semibold text-slate-600">
+                  <div>Subtotal:</div>
+                  <div>Delivery Charges:</div>
+                  <div className="pt-1 text-slate-900">Total Amount:</div>
+                </div>
+                <div className="space-y-1 text-right">
+                  <div>PKR {Number(activeOrder.subtotal || 0).toFixed(2)}</div>
+                  <div className={activeOrder.delivery_fee > 0 ? 'text-slate-700' : 'text-emerald-600'}>
+                    {activeOrder.delivery_fee > 0 ? `PKR ${activeOrder.delivery_fee.toFixed(2)}` : 'FREE'}
+                  </div>
+                  <div className="pt-1 text-blue-600">PKR {Number(activeOrder.total_amount || 0).toFixed(2)}</div>
+                </div>
               </div>
             </div>
 

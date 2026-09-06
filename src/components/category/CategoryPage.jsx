@@ -4,6 +4,7 @@ import { fetchMedicines, fetchMedicineByName } from '../../services/supabaseClie
 import MedicineCard from '../MedicineCard';
 import MedicineDetailModal from '../MedicineDetailModal';
 import SearchBarAndFilters from '../SearchBarAndFilters';
+import BrandShowcase from '../BrandShowcase';
 import { ArrowLeft, Pill, Plus } from 'lucide-react';
 
 export default function CategoryPage({ onAddToCart }) {
@@ -83,9 +84,15 @@ export default function CategoryPage({ onAddToCart }) {
     const nameMatch = (item.name || '').toLowerCase().includes(q);
     const formulaMatch = (item.formula || '').toLowerCase().includes(q);
     const brandMatch = (item.brand || '').toLowerCase().includes(q);
+    const companyMatch = (item.company || '').toLowerCase().includes(q);
+    const manufacturerMatch = (item.manufacturer || '').toLowerCase().includes(q);
 
-    return matchesCategory && (nameMatch || formulaMatch || brandMatch);
+    return matchesCategory && (nameMatch || formulaMatch || brandMatch || companyMatch || manufacturerMatch);
   });
+
+  const handleBrandSelect = (brand) => {
+    setSearchQuery(brand.name);
+  };
 
   return (
     <div className="soft-canvas min-h-screen text-slate-800 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
@@ -109,6 +116,9 @@ export default function CategoryPage({ onAddToCart }) {
             Browse our verified selection of authentic healthcare items and medicines under this category, delivered straight to your door.
           </p>
         </div>
+
+        {/* Brand logos above the category search */}
+        <BrandShowcase onSelectBrand={handleBrandSelect} />
 
         {/* Search Bar & Popular Formulas Panel */}
         <SearchBarAndFilters

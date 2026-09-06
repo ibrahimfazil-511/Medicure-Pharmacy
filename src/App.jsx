@@ -372,7 +372,10 @@ import ContactUsModal from './components/ContactUsModal.jsx';
 import CartDrawer from './components/CartDrawer.jsx';
 import Footer from './components/Footer.jsx';
 import AdminPanel from './components/AdminPanel.jsx';
+import AdminLoginModal from './components/AdminLoginModal.jsx';
 import CategoryPage from './components/category/CategoryPage.jsx';
+import OrderConfirmation from './components/OrderConfirmation.jsx';
+import PromoCarousel from './components/PromoCarousel.jsx';
 
 import { CATEGORIES } from './data/initialMedicines.js';
 import { fetchMedicines } from './services/supabaseClient.js';
@@ -394,7 +397,8 @@ function StoreFront({
   onClearCart,
   totalCartCount,
   isCartOpen,
-  setIsCartOpen
+  setIsCartOpen,
+  onOpenAdminPortal
 }) {
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -456,8 +460,10 @@ function StoreFront({
       const formulaMatch = (item.formula || '').toLowerCase().includes(q);
       const genericMatch = (item.genericName || '').toLowerCase().includes(q);
       const brandMatch = (item.brand || '').toLowerCase().includes(q);
+      const companyMatch = (item.company || '').toLowerCase().includes(q);
+      const manufacturerMatch = (item.manufacturer || '').toLowerCase().includes(q);
 
-      return categoryMatch && (nameMatch || formulaMatch || genericMatch || brandMatch);
+      return categoryMatch && (nameMatch || formulaMatch || genericMatch || brandMatch || companyMatch || manufacturerMatch);
     });
   }, [medicines, searchQuery, selectedCategory]);
 
@@ -477,12 +483,16 @@ function StoreFront({
           if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
         onCategoryClick={(cat) => setSelectedCategory(cat)}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
       />
 
       <main className="flex-1">
 
+        <PromoCarousel onUploadPrescription={() => setIsPrescriptionOpen(true)} />
+
         {/* Soft UI Hero Banner */}
-        <section className="relative pt-8 pb-12 overflow-hidden bg-gradient-to-b from-[#eef8f7] via-white to-[#f4f8f8]">
+        <section className="hidden relative pt-8 pb-12 overflow-hidden bg-gradient-to-b from-[#eef8f7] via-white to-[#f4f8f8]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="soft-card clinic-hero p-4 sm:p-10 border border-white/90 relative overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 items-center">
@@ -573,10 +583,11 @@ function StoreFront({
         </section>
 
         {/* All Products & Medicines Grid Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 clinic-hero">
+        <section id="products-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 clinic-hero">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-              {selectedCategory ? `Showing: ${selectedCategory}` : 'All Products & Medicines'}
+              {/* {selectedCategory ? `Showing: ${selectedCategory}` : 'All Products & Medicines'} */}
+              All Products & Medicines
             </h2>
             <span className="text-xs font-bold text-slate-500">
               ({filteredMedicines.length} items available)
@@ -669,20 +680,11 @@ function StoreFront({
         onClose={() => setIsContactUsOpen(false)}
       />
 
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-        onUpdateQuantity={onUpdateQuantity}
-        onRemoveItem={onRemoveFromCart}
-        onClearCart={onClearCart}
-        onOpenPrescription={() => setIsPrescriptionOpen(true)}
-      />
-
       <Footer
         onOpenPrescription={() => setIsPrescriptionOpen(true)}
         onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
         onOpenContactUs={() => setIsContactUsOpen(true)}
+        onOpenAdminPortal={onOpenAdminPortal}
         onCategoryClick={(cat) => setSelectedCategory(cat)}
       />
 
@@ -695,6 +697,8 @@ export default function App() {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
+  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState(null);
 
   const handleAddToCart = (medicine, qty = 1) => {
     setCartItems((prev) => {
@@ -736,6 +740,15 @@ export default function App() {
     /* YAHAN BASENAME ADD KIYA GAYA HAI */
     <Router basename={import.meta.env.BASE_URL.replace(/\/$/, '') || undefined}>
       <Routes>
+        <Route
+          path="/order-confirmation"
+          element={completedOrder ? (
+            <OrderConfirmation
+              order={completedOrder}
+              onContinueShopping={() => setCompletedOrder(null)}
+            />
+          ) : <Navigate to="/" replace />}
+        />
         <Route 
           path="/" 
           element={
@@ -748,6 +761,7 @@ export default function App() {
               totalCartCount={totalCartCount}
               isCartOpen={isCartOpen}
               setIsCartOpen={setIsCartOpen}
+              onOpenAdminPortal={() => setIsAdminLoginOpen(true)}
             />
           } 
         />
@@ -771,11 +785,20 @@ export default function App() {
         onRemoveItem={handleRemoveFromCart}
         onClearCart={handleClearCart}
         onOpenPrescription={() => setIsPrescriptionOpen(true)}
+        onOrderCompleted={(order) => {
+          setCompletedOrder(order);
+          setIsCartOpen(false);
+        }}
       />
 
       <PrescriptionUploadModal
         isOpen={isPrescriptionOpen}
         onClose={() => setIsPrescriptionOpen(false)}
+      />
+
+      <AdminLoginModal
+        isOpen={isAdminLoginOpen}
+        onClose={() => setIsAdminLoginOpen(false)}
       />
     </Router>
   );

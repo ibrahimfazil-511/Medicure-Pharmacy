@@ -9,7 +9,7 @@ import {
   FaShieldAlt 
 } from 'react-icons/fa';
 
-export default function Footer() {
+export default function Footer({ onOpenAdminPortal }) {
   return (
     <footer className="bg-[#eaf3f3] text-slate-700 pt-10 sm:pt-16 pb-8 border-t border-[#d9e6e7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,6 +53,11 @@ export default function Footer() {
               QUICK NAVIGATION
             </h3>
             <ul className="space-y-2.5 text-sm font-medium">
+              <li>
+                <button type="button" onClick={onOpenAdminPortal} className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
+                  <span className="text-teal-500">›</span> Admin / Staff Portal
+                </button>
+              </li>
               <li>
                 <a href="/" className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
                   <span className="text-teal-500">›</span> Shop by Category

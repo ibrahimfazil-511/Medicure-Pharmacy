@@ -1,0 +1,89 @@
+import React from 'react';
+import { ArrowLeft, CheckCircle2, Clipboard, MapPin, Phone, ReceiptText, ShieldCheck, Truck, UserRound } from 'lucide-react';
+
+function Detail({ label, value }) {
+  return (
+    <div>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{label}</p>
+      <p className="mt-1 break-words text-sm font-bold text-slate-900">{value || 'Not provided'}</p>
+    </div>
+  );
+}
+
+export default function OrderConfirmation({ order, onContinueShopping }) {
+  if (!order) return null;
+  const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+
+  return (
+    <div className="soft-canvas min-h-screen text-slate-800">
+      <header className="border-b border-[#d9e6e7] bg-white/90 px-4 py-4 shadow-sm backdrop-blur sm:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600 text-xl font-black text-white">+</div>
+            <span className="text-lg font-black text-slate-900">Medi<span className="text-teal-600">Cure</span> Pharmacy</span>
+          </div>
+          <span className="hidden text-xs font-bold text-slate-500 sm:block">Secure pharmacy checkout</span>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-5xl">
+          <section className="clinic-hero mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg"><CheckCircle2 className="h-7 w-7" /></div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-widest text-emerald-700">Order confirmed</p>
+                  <h1 className="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">Thank you, {order.customerName}</h1>
+                  <p className="mt-1 text-sm text-slate-600">Your order has been received and is being prepared for delivery.</p>
+                </div>
+              </div>
+              <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Tracking ID</p>
+                <p className="mt-1 font-mono text-lg font-black text-teal-700">{order.trackingId}</p>
+              </div>
+            </div>
+          </section>
+
+          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+            <section className="space-y-6">
+              <div className="soft-card p-5 sm:p-6">
+                <div className="mb-5 flex items-center gap-2 border-b border-slate-200 pb-4"><UserRound className="h-5 w-5 text-teal-600" /><h2 className="text-lg font-black text-slate-900">Customer details</h2></div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Detail label="Full name" value={order.customerName} />
+                  <Detail label="Email address" value={order.customerEmail} />
+                  <Detail label="Phone number" value={order.phone} />
+                  <Detail label="Order date" value={order.createdAt} />
+                </div>
+                <div className="mt-5 border-t border-slate-200 pt-5"><Detail label="Delivery address" value={`${order.shippingAddress}, ${order.city}`} /></div>
+              </div>
+
+              <div className="soft-card p-5 sm:p-6">
+                <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-4"><div className="flex items-center gap-2"><ReceiptText className="h-5 w-5 text-teal-600" /><h2 className="text-lg font-black text-slate-900">Ordered items</h2></div><span className="text-xs font-bold text-slate-500">{itemCount} item{itemCount === 1 ? '' : 's'}</span></div>
+                <div className="space-y-4">
+                  {order.items.map((item) => (
+                    <div key={item.medicine.id} className="flex items-center gap-3 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
+                      <img src={item.medicine.imageUrl} alt={item.medicine.name} className="h-16 w-16 shrink-0 rounded-xl border border-slate-200 bg-slate-50 object-cover" />
+                      <div className="min-w-0 flex-1"><p className="font-bold text-slate-900">{item.medicine.name}</p><p className="mt-1 text-xs text-teal-700">{item.medicine.formula || 'Pharmacy product'}</p><p className="mt-1 text-xs font-semibold text-slate-500">Quantity: {item.quantity}</p></div>
+                      <p className="text-sm font-black text-slate-900">Rs {(item.medicine.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <aside className="space-y-6">
+              <div className="soft-card p-5 sm:p-6">
+                <div className="mb-5 flex items-center gap-2 border-b border-slate-200 pb-4"><Clipboard className="h-5 w-5 text-teal-600" /><h2 className="text-lg font-black text-slate-900">Order summary</h2></div>
+                <div className="space-y-3 text-sm"><div className="flex justify-between gap-4 text-slate-600"><span>Subtotal</span><strong className="text-slate-900">Rs {order.subtotal.toFixed(2)}</strong></div><div className="flex justify-between gap-4 text-slate-600"><span>Delivery charges</span><strong className="text-slate-900">{order.shippingFee ? `Rs ${order.shippingFee.toFixed(2)}` : 'FREE'}</strong></div><div className="flex justify-between gap-4 border-t border-slate-200 pt-4 text-base font-black"><span>Total amount</span><strong className="text-teal-700">Rs {order.total.toFixed(2)}</strong></div></div>
+                <div className="mt-5 rounded-xl bg-teal-50 p-4"><p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Payment method</p><p className="mt-1 font-black text-teal-800">{order.paymentMethod}</p></div>
+              </div>
+              <div className="soft-inset p-5"><div className="flex items-start gap-3"><Truck className="mt-0.5 h-5 w-5 shrink-0 text-teal-600" /><p className="text-sm font-bold text-slate-800">Expected delivery within 45 minutes</p></div><div className="mt-3 flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" /><p className="text-sm text-slate-600">Our pharmacist will verify prescription items before dispatch.</p></div><div className="mt-3 flex items-start gap-3"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-teal-600" /><p className="text-sm text-slate-600">Delivering to {order.city}</p></div><div className="mt-3 flex items-start gap-3"><Phone className="mt-0.5 h-5 w-5 shrink-0 text-teal-600" /><p className="text-sm text-slate-600">Rider will contact you at {order.phone}</p></div></div>
+            </aside>
+          </div>
+          <button onClick={onContinueShopping} className="soft-btn-primary mt-8 flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold sm:mx-auto sm:w-auto"><ArrowLeft className="h-4 w-4" /> Continue shopping</button>
+        </div>
+      </main>
+    </div>
+  );
+}
