@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const brands = [
   { name: 'AGP', domain: 'agp.com.pk', aliases: ['agp'] },
@@ -10,10 +11,12 @@ const brands = [
   { name: 'CCL', domain: 'cclpharma.com', aliases: ['ccl'] }
 ];
 
-export default function BrandShowcase({ onSelectBrand }) {
+export default function BrandShowcase() {
+  const navigate = useNavigate();
+
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" aria-labelledby="trusted-brands-heading">
-      <div className="mb-5 flex items-end justify-between gap-4">
+    <section className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8" aria-labelledby="trusted-brands-heading">
+      <div className="mb-3 flex items-end justify-between gap-4">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.16em] text-teal-700">Trusted manufacturers</p>
           <h2 id="trusted-brands-heading" className="mt-1 text-xl sm:text-2xl font-black text-slate-900">Shop by Brand</h2>
@@ -26,8 +29,8 @@ export default function BrandShowcase({ onSelectBrand }) {
           <button
             key={brand.name}
             type="button"
-            onClick={() => onSelectBrand(brand)}
-            className="group flex min-h-36 flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-teal-400 hover:shadow-lg"
+            onClick={() => navigate(`/category/medicines?brand=${encodeURIComponent(brand.name)}`)}
+            className="group flex min-h-32 flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:border-teal-400 hover:shadow-lg"
           >
             <span className="flex h-20 w-full items-center justify-center rounded-lg bg-white p-2">
               <img

@@ -9,7 +9,7 @@ import {
   FaShieldAlt 
 } from 'react-icons/fa';
 
-export default function Footer({ onOpenAdminPortal, onOpenLegal }) {
+export default function Footer({ onOpenAdminPortal, onOpenPrescription, onOpenTrackOrder, onOpenContactUs, onOpenLegal }) {
   return (
     <footer className="bg-[#eaf3f3] text-slate-700 pt-10 sm:pt-16 pb-8 border-t border-[#d9e6e7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -64,19 +64,19 @@ export default function Footer({ onOpenAdminPortal, onOpenLegal }) {
                 </a>
               </li>
               <li>
-                <a href="#prescription-upload" className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
+                <button type="button" onClick={onOpenPrescription} className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
                   <span className="text-teal-500">›</span> Prescription Upload
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#track-order" className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
+                <button type="button" onClick={onOpenTrackOrder} className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
                   <span className="text-teal-500">›</span> Track Order Status
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#contact-us" className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
+                <button type="button" onClick={onOpenContactUs} className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold">
                   <span className="text-teal-500">›</span> Contact Us & Hotline
-                </a>
+                </button>
               </li>
             </ul>
           </div>

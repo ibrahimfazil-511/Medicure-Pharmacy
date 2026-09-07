@@ -374,6 +374,7 @@ import Footer from './components/Footer.jsx';
 import AdminPanel from './components/AdminPanel.jsx';
 import AdminLoginModal from './components/AdminLoginModal.jsx';
 import CategoryPage from './components/category/CategoryPage.jsx';
+import BrandShowcase from './components/BrandShowcase.jsx';
 import OrderConfirmation from './components/OrderConfirmation.jsx';
 import PromoCarousel from './components/PromoCarousel.jsx';
 import LegalModal from './components/LegalModal.jsx';
@@ -457,7 +458,6 @@ function StoreFront({
 
       const q = searchQuery.toLowerCase().trim();
       if (!q) return categoryMatch;
-
       const nameMatch = (item.name || '').toLowerCase().includes(q);
       const formulaMatch = (item.formula || '').toLowerCase().includes(q);
       const genericMatch = (item.genericName || '').toLowerCase().includes(q);
@@ -491,7 +491,12 @@ function StoreFront({
 
       <main className="flex-1">
 
-        <PromoCarousel onUploadPrescription={() => setIsPrescriptionOpen(true)} />
+        <PromoCarousel
+          onOrderNow={() => {
+            const categorySection = document.getElementById('shop-categories');
+            categorySection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        />
 
         {/* Soft UI Hero Banner */}
         <section className="hidden relative pt-8 pb-12 overflow-hidden bg-gradient-to-b from-[#eef8f7] via-white to-[#f4f8f8]">
@@ -591,9 +596,11 @@ function StoreFront({
               {/* {selectedCategory ? `Showing: ${selectedCategory}` : 'All Products & Medicines'} */}
               All Products & Medicines
             </h2>
-            <span className="text-xs font-bold text-slate-500">
-              ({filteredMedicines.length} items available)
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-slate-500">
+                ({filteredMedicines.length} items available)
+              </span>
+            </div>
           </div>
 
           {loading ? (
@@ -623,6 +630,8 @@ function StoreFront({
             </div>
           )}
         </section>
+
+        <BrandShowcase />
 
       </main> 
 
@@ -773,7 +782,16 @@ export default function App() {
         {/* Dynamic Route for Categories */}
         <Route 
           path="/category/:categoryId" 
-          element={<CategoryPage onAddToCart={handleAddToCart} />} 
+          element={
+            <CategoryPage
+              onAddToCart={handleAddToCart}
+              onOpenPrescription={() => setIsPrescriptionOpen(true)}
+              onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
+              onOpenContactUs={() => setIsContactUsOpen(true)}
+              onOpenCart={() => setIsCartOpen(true)}
+              cartCount={totalCartCount}
+            />
+          }
         />
         <Route
           path="/admin"

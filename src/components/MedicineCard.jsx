@@ -120,7 +120,7 @@
 
 
 import React from 'react';
-import { ShoppingCart, Star } from 'lucide-react';
+import { Pill, ShoppingCart, Star } from 'lucide-react';
 
 export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
   if (!medicine) return null;
@@ -160,7 +160,8 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
       <div className="mt-auto rounded-b-2xl bg-slate-100 px-4 py-3">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <h3 className="line-clamp-2 min-h-[2.5rem] text-base font-medium leading-tight text-slate-900">
+            <h3 className="flex min-h-[2.5rem] items-start gap-1.5 text-base font-medium leading-tight text-slate-900">
+              <Pill aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" />
               {medicine.name}
             </h3>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">

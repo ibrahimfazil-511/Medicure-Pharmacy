@@ -86,6 +86,29 @@ export default function AdminPanel() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    const requiredFields = [
+      ['Medicine Name', newMed.name],
+      ['Company Name', newMed.company],
+      ['Category', newMed.category],
+      ['Price', newMed.price],
+      ['Stock Qty', newMed.stock],
+      ['Description', newMed.description]
+    ];
+
+    if (newMed.category === 'medicines') {
+      requiredFields.push(
+        ['Formula', newMed.formula],
+        ['Discount', newMed.discount],
+        ['Product Image', newMed.image_url]
+      );
+    }
+
+    const missingField = requiredFields.find(([, value]) => String(value ?? '').trim() === '');
+    if (missingField) {
+      alert(`${missingField[0]} is required.`);
+      return;
+    }
+
     const payload = {
       name: newMed.name,
       formula: newMed.formula,
@@ -361,6 +384,7 @@ export default function AdminPanel() {
                       value={newMed.discount}
                       onChange={(e) => setNewMed({ ...newMed, discount: e.target.value })}
                       className="w-full px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs outline-none text-slate-800"
+                      required={newMed.category === 'medicines'}
                     />
                   </div>
 
@@ -374,6 +398,7 @@ export default function AdminPanel() {
                       value={newMed.image_url}
                       onChange={(e) => setNewMed({ ...newMed, image_url: e.target.value })}
                       className="w-full px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs outline-none text-slate-800"
+                      required={newMed.category === 'medicines'}
                     />
                     <p className="text-[10px] text-slate-500">Use an image URL or choose an image from your folder.</p>
                     <input
@@ -404,6 +429,7 @@ export default function AdminPanel() {
                     value={newMed.description}
                     onChange={(e) => setNewMed({ ...newMed, description: e.target.value })}
                     className="w-full px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs outline-none text-slate-800 h-20 resize-none"
+                    required
                   />
                 </div>
 

@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   Search,
   Lock,
-  User
+  User,
+  ArrowLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -116,7 +117,9 @@ export default function Navbar({
   cartCount,
   onCategoryClick,
   searchQuery,
-  setSearchQuery
+  setSearchQuery,
+  showBackToHome = false,
+  hideSearch = false
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -129,7 +132,13 @@ export default function Navbar({
             {/* Logo & Brand Name */}
             <div 
               className="flex items-center space-x-2 cursor-pointer min-w-0 shrink-0" 
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => {
+                if (showBackToHome) {
+                  window.location.href = import.meta.env.BASE_URL || '/';
+                  return;
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             >
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-white shadow-sm shadow-teal-500/10 overflow-hidden border border-slate-100 p-0.5 shrink-0">
                 <img src={logoImg} alt="MediCure Pharmacy Logo" className="w-full h-full object-cover rounded-lg" referrerPolicy="no-referrer" />
@@ -148,6 +157,19 @@ export default function Navbar({
                 </p>
               </div>
             </div>
+
+            {showBackToHome && (
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = import.meta.env.BASE_URL || '/';
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-teal-200 bg-teal-50 text-xs font-bold text-teal-800 hover:bg-teal-100 transition"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back to Home
+              </button>
+            )}
 
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center space-x-1 bg-slate-200/60 p-1 rounded-xl border border-slate-300/40 shadow-inner shrink-0">
@@ -182,7 +204,7 @@ export default function Navbar({
 
             {/* Product Search and Right Action Buttons */}
             <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-              <label className="hidden md:flex w-40 lg:w-56 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-teal-400 focus-within:bg-white">
+              {!hideSearch && <label className="hidden md:flex w-40 lg:w-56 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-teal-400 focus-within:bg-white">
                 <Search className="h-4 w-4 shrink-0 text-slate-400" />
                 <input
                   type="search"
@@ -192,7 +214,7 @@ export default function Navbar({
                   aria-label="Search products"
                   className="w-full bg-transparent text-xs font-semibold text-slate-700 outline-none placeholder:text-slate-400"
                 />
-              </label>
+              </label>}
 
               {/* Contact Us Button */}
               <button
@@ -233,7 +255,7 @@ export default function Navbar({
         {/* Mobile Drawer Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden px-4 pt-3 pb-5 bg-white/95 backdrop-blur-md border-b border-slate-200 space-y-2 shadow-xl animate-in slide-in-from-top-2">
-            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 focus-within:border-teal-400 focus-within:bg-white">
+            {!hideSearch && <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 focus-within:border-teal-400 focus-within:bg-white">
               <Search className="h-4 w-4 shrink-0 text-slate-400" />
               <input
                 type="search"
@@ -243,7 +265,20 @@ export default function Navbar({
                 aria-label="Search all products"
                 className="w-full bg-transparent text-xs font-semibold text-slate-700 outline-none placeholder:text-slate-400"
               />
-            </label>
+            </label>}
+            {showBackToHome && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  window.location.href = import.meta.env.BASE_URL || '/';
+                }}
+                className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-teal-800 flex items-center gap-3 bg-teal-50"
+              >
+                <ArrowLeft className="w-4 h-4 text-teal-600" />
+                Back to Home
+              </button>
+            )}
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

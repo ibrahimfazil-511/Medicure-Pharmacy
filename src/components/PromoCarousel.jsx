@@ -24,6 +24,8 @@ const promoStyles = `
 .promo-cta { display: inline-flex; align-items: center; gap: 0.7rem; padding: 0.75rem 1.2rem; border: 0; border-radius: 999px; background: var(--clinic-teal); color: #fff; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.04em; white-space: nowrap; box-shadow: 0 10px 22px rgba(8, 127, 120, 0.25); cursor: pointer; transition: 0.2s ease; }
 .promo-cta:hover { background: var(--clinic-teal-dark); transform: translateY(-2px); }
 .promo-contact { margin: 0; color: var(--clinic-muted); font-size: 0.76rem; white-space: nowrap; }
+.promo-contact a { display: inline-flex; align-items: center; gap: 0.25rem; color: inherit; text-decoration: none; }
+.promo-contact a:hover { color: var(--clinic-teal); }
 .promo-contact b { color: var(--clinic-ink); }
 .promo-art { position: absolute; right: 0; bottom: 0; z-index: 1; width: 43%; height: 100%; }
 .promo-art-heading { position: absolute; top: 2.2rem; right: 2.8rem; color: var(--clinic-teal-dark); font-size: 0.82rem; font-weight: 900; }
@@ -77,7 +79,7 @@ const slides = [
   { eyebrow: 'Easy prescription service', title: 'Upload your Rx,', accent: 'we handle the rest', body: 'Send your prescription to our team for quick review by a qualified pharmacist.', icon: FileText, art: 'prescription', label: 'Pharmacist verified', detail: 'Quick review before dispatch' },
 ];
 
-export default function PromoCarousel({ onUploadPrescription }) {
+export default function PromoCarousel({ onOrderNow }) {
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
@@ -99,8 +101,8 @@ export default function PromoCarousel({ onUploadPrescription }) {
           <p className="promo-description">{slide.body}</p>
           <div className="promo-benefits"><span><SlideIcon size={16} /> Authentic products</span><span><Truck size={16} /> Fast local delivery</span></div>
           <div className="promo-actions">
-            <button type="button" className="promo-cta" onClick={onUploadPrescription}><span>Upload prescription</span><ArrowRight size={17} /></button>
-            <p className="promo-contact"><MessageCircle size={16} /> WhatsApp: <b>+92 334 2850819</b></p>
+            <button type="button" className="promo-cta" onClick={onOrderNow}><span>Order Now</span><ArrowRight size={17} /></button>
+            <p className="promo-contact"><a href="https://wa.me/923342850819?text=Hello%20MediCure%20Pharmacy%2C%20I%20want%20to%20place%20an%20order." target="_blank" rel="noopener noreferrer"><MessageCircle size={16} /> WhatsApp: <b>+92 334 2850819</b></a></p>
           </div>
         </div>
         <div className="promo-art" aria-hidden="true">
