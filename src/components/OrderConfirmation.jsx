@@ -26,28 +26,28 @@ export default function OrderConfirmation({ order, onContinueShopping }) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
+      <main className="mx-auto max-w-7xl px-3 sm:px-6 py-5 sm:py-12">
         <div className="mx-auto max-w-5xl">
-          <section className="clinic-hero mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg"><CheckCircle2 className="h-7 w-7" /></div>
+          <section className="clinic-hero mb-6 rounded-2xl sm:rounded-3xl border border-emerald-200 bg-emerald-50 p-4 sm:p-7">
+            <div className="flex flex-col gap-4 sm:gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3.5 sm:gap-4">
+                <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg"><CheckCircle2 className="h-6 w-6 sm:h-7 sm:w-7" /></div>
                 <div>
-                  <p className="text-xs font-black uppercase tracking-widest text-emerald-700">Order confirmed</p>
-                  <h1 className="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">Thank you, {order.customerName}</h1>
-                  <p className="mt-1 text-sm text-slate-600">Your order has been received and is being prepared for delivery.</p>
+                  <p className="text-[11px] sm:text-xs font-black uppercase tracking-widest text-emerald-700">Order confirmed</p>
+                  <h1 className="mt-1 text-xl sm:text-3xl font-black text-slate-900">Thank you, {order.customerName}</h1>
+                  <p className="mt-1 text-xs sm:text-sm text-slate-600">Your order has been received and is being prepared for delivery.</p>
                 </div>
               </div>
-              <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
+              <div className="rounded-xl bg-white px-4 py-3 shadow-sm shrink-0">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Tracking ID</p>
-                <p className="mt-1 font-mono text-lg font-black text-teal-700">{order.trackingId}</p>
+                <p className="mt-0.5 font-mono text-base sm:text-lg font-black text-teal-700">{order.trackingId}</p>
               </div>
             </div>
           </section>
 
-          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-            <section className="space-y-6">
-              <div className="soft-card p-5 sm:p-6">
+          <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+            <section className="space-y-5 sm:space-y-6">
+              <div className="soft-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl">
                 <div className="mb-5 flex items-center gap-2 border-b border-slate-200 pb-4"><UserRound className="h-5 w-5 text-teal-600" /><h2 className="text-lg font-black text-slate-900">Customer details</h2></div>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Detail label="Full name" value={order.customerName} />

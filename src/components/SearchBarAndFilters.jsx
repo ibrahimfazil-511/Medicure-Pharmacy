@@ -115,15 +115,16 @@ export default function SearchBarAndFilters({
         </div>
 
         {/* Dynamic Quick Tags based on Category */}
-        <div className="mt-3 flex items-center gap-2 flex-wrap text-xs">
-          <span className="font-extrabold text-slate-500 flex items-center gap-1">
+        <div className="mt-3 flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 sm:flex-wrap no-scrollbar touch-scroll text-xs">
+          <span className="font-extrabold text-slate-500 flex items-center gap-1 shrink-0 text-[11px] sm:text-xs">
             <TagIcon className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> {currentConfig.tagTitle}
           </span>
           {currentConfig.tags.map((item) => (
             <button
               key={item.label}
+              type="button"
               onClick={() => setSearchQuery(item.query)}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition-all soft-btn ${
+              className={`px-2.5 sm:px-3 py-1 rounded-xl text-[11px] sm:text-xs font-bold transition-all soft-btn shrink-0 whitespace-nowrap active:scale-95 ${
                 searchQuery.toLowerCase().includes(item.query.toLowerCase())
                   ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
                   : 'text-slate-700 hover:text-teal-700'

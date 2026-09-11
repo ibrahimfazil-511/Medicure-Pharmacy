@@ -166,40 +166,45 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="soft-card w-full max-w-2xl bg-[#f4f8f8] p-6 sm:p-8 relative border border-white max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div 
+        className="absolute inset-0" 
+        onClick={onClose} 
+      />
+      <div className="soft-card w-full max-w-2xl bg-[#f4f8f8] p-4 sm:p-6 md:p-8 relative border border-white rounded-2xl sm:rounded-3xl shadow-2xl max-h-[92dvh] overflow-y-auto z-10 no-scrollbar">
         
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900 active:scale-95 transition-all"
+          aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl soft-inset flex items-center justify-center text-blue-600 bg-blue-50">
-            <Truck className="w-7 h-7" />
+        <div className="flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-6 pr-8">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl soft-inset flex items-center justify-center text-blue-600 bg-blue-50 shrink-0">
+            <Truck className="w-5 h-5 sm:w-7 sm:h-7" />
           </div>
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800">
-              Live Order & Delivery Tracker
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-800">
+              Live Order Tracker
             </h2>
-            <p className="text-xs font-semibold text-slate-500">
-              Enter your tracking ID and registered phone number to view details securely
+            <p className="text-[11px] sm:text-xs font-semibold text-slate-500">
+              Enter your tracking ID and registered phone number to view live details
             </p>
           </div>
         </div>
 
         {successTrackingId && (
-          <div className="mb-6 p-4 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold text-center">
+          <div className="mb-5 sm:mb-6 p-3 sm:p-4 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold text-center">
             🎉 Order Successful! Your Tracking ID: <span className="text-blue-600 underline text-sm">{successTrackingId}</span> (Note this down!)
           </div>
         )}
 
         {/* Secure Tracking Input Search Form (Tracking ID + Phone) */}
-        <form onSubmit={handleSearch} className="space-y-3 mb-6">
-          <div className="flex flex-col sm:flex-row gap-2">
+        <form onSubmit={handleSearch} className="space-y-3 mb-5 sm:mb-6">
+          <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-2">
             <div className="relative flex-1">
               <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
               <input
@@ -210,12 +215,12 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
                   setTrackingInput(value.startsWith('MED-') ? `MED-${value.slice(4).replace(/\D/g, '')}` : 'MED-');
                 }}
                 aria-label="Tracking number"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl soft-inset-sm text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="relative flex-1 flex items-center rounded-xl soft-inset-sm bg-white focus-within:ring-2 focus-within:ring-blue-500">
               <Phone className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
-              <span className="pl-10 pr-1 text-xs font-bold text-slate-700">+92</span>
+              <span className="pl-10 pr-1 text-sm sm:text-xs font-bold text-slate-700">+92</span>
               <input
                 type="tel"
                 value={phoneInput}
@@ -224,14 +229,14 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
                 maxLength={10}
                 inputMode="numeric"
                 aria-label="Phone number without country code"
-                className="min-w-0 flex-1 pr-4 py-2.5 bg-transparent text-xs font-bold text-slate-800 focus:outline-none"
+                className="min-w-0 flex-1 pr-4 py-2.5 sm:py-2 bg-transparent text-sm sm:text-xs font-bold text-slate-800 focus:outline-none"
               />
             </div>
           </div>
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full soft-btn-primary py-2.5 rounded-xl font-bold text-xs disabled:opacity-50"
+            className="w-full soft-btn-primary py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm disabled:opacity-50 active:scale-[0.99] transition-all"
           >
             {isLoading ? 'Verifying & Searching...' : 'Securely Track Order'}
           </button>

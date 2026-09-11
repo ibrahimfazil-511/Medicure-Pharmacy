@@ -84,19 +84,23 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="soft-card w-full max-w-xl bg-[#f4f8f8] p-4 sm:p-8 relative border border-white max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div 
+        className="absolute inset-0"
+        onClick={resetForm}
+      />
+      <div className="soft-card w-full max-w-xl bg-[#f4f8f8] p-4 sm:p-6 md:p-8 relative border border-white rounded-2xl sm:rounded-3xl shadow-2xl max-h-[92dvh] overflow-y-auto z-10 no-scrollbar">
         
         {!submittedRx ? (
           <div>
             {/* Header with structured flex to prevent overlapping */}
             <div className="flex items-start justify-between gap-3 mb-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 sm:gap-3">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl soft-inset flex items-center justify-center text-emerald-600 bg-emerald-50 shrink-0">
-                  <FileText className="w-6 h-6 sm:w-7 sm:h-7" />
+                  <FileText className="w-5 h-5 sm:w-7 sm:h-7" />
                 </div>
                 <div>
-                  <h2 className="text-base sm:text-xl font-extrabold text-slate-800 pr-6">
+                  <h2 className="text-base sm:text-xl font-extrabold text-slate-800">
                     Upload Doctor's Prescription
                   </h2>
                   <p className="text-[11px] sm:text-xs font-semibold text-slate-500">
@@ -107,7 +111,8 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
               {/* Close Button inline or safely placed */}
               <button 
                 onClick={resetForm}
-                className="p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900 shrink-0"
+                className="p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900 shrink-0 active:scale-95 transition-all"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -177,7 +182,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-teal-600" /> Patient Full Name
+                    <User className="w-3.5 h-3.5 text-teal-600" /> Patient Full Name <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -185,13 +190,13 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
                     value={patientName}
                     onChange={(e) => setPatientName(e.target.value)}
                     placeholder="e.g. Ali Ahmed"
-                    className="w-full px-3.5 py-2 rounded-xl soft-inset-sm text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-teal-600" /> Patient Age / Gender
+                    <Calendar className="w-3.5 h-3.5 text-teal-600" /> Patient Age / Gender <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -199,14 +204,14 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
                     value={patientAge}
                     onChange={(e) => setPatientAge(e.target.value)}
                     placeholder="e.g. 34 yrs / Male"
-                    className="w-full px-3.5 py-2 rounded-xl soft-inset-sm text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 text-teal-600" /> WhatsApp / Phone Number
+                  <Phone className="w-3.5 h-3.5 text-teal-600" /> WhatsApp / Phone Number <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="tel"
@@ -214,7 +219,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
                   value={patientPhone}
                   onChange={(e) => setPatientPhone(e.target.value)}
                   placeholder="e.g. +92 300 1234567"
-                  className="w-full px-3.5 py-2 rounded-xl soft-inset-sm text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
 
@@ -227,7 +232,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g. Need 1 month course, substitute with generic if available..."
-                  className="w-full px-3.5 py-2 rounded-xl soft-inset-sm text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                 ></textarea>
               </div>
 
@@ -235,7 +240,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full soft-btn-primary py-3 rounded-xl font-bold text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2"
+                className="w-full soft-btn-primary py-3 sm:py-3.5 rounded-xl font-bold text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] transition-all"
               >
                 {submitting ? 'Sending to Pharmacist...' : 'Submit Prescription for Verification'}
               </button>

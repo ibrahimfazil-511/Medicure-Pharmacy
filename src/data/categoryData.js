@@ -1,7 +1,7 @@
 import { Pill, Heart, Baby, Dumbbell, Leaf, Stethoscope } from 'lucide-react';
 
 export const CATEGORY_DATA = [
-  { id: 'medicines', name: 'Medicines', label: 'Medicines', icon: Pill, subcategories: ['Pain Relief', 'Cold & Flu', 'Allergy Relief', 'Digestive Health', 'Vitamins & Supplements', 'Diabetes Care', 'Heart Care', 'Antibiotics'] },
+  { id: 'medicines', name: 'Medicines', label: 'Medicines', icon: Pill, subcategories: ['Derma', 'Gastro-Intestinal Tract', 'Circulatory System', 'Others', 'Endocrine System', 'Eyes, Nose, Ear', 'Urinary Tract System', 'Central Nervous System', 'Respiratory Tract System', 'Cardio-Vascular System', 'Oral Care'] },
   { id: 'personal-care', name: 'Personal Care', label: 'Personal Care', icon: Heart, subcategories: ['Skin Care', 'Hair Care', 'Oral Care', 'Feminine Care', 'Men Grooming', 'Face Wash', 'Hand & Foot Care', 'Body Care'] },
   { id: 'baby-care', name: 'Baby Care', label: 'Baby Care', icon: Baby, subcategories: ['Baby Food', 'Diapers', 'Baby Skin Care', 'Mother Care', 'Baby Bath', 'Baby Feeding', 'Baby Health', 'Baby Accessories'] },
   { id: 'lifestyle', name: 'Lifestyle & Fitness', label: 'Lifestyle & Fitness', icon: Dumbbell, subcategories: ['Nutrition', 'Weight Management', 'Sports Support', 'Wellness', 'Fitness Accessories', 'Protein & Energy', 'Sleep Support', 'Sexual Wellness'] },

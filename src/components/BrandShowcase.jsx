@@ -15,22 +15,22 @@ export default function BrandShowcase() {
   const navigate = useNavigate();
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8" aria-labelledby="trusted-brands-heading">
+    <section className="mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 py-3 sm:py-4" aria-labelledby="trusted-brands-heading">
       <div className="mb-3 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-teal-700">Trusted manufacturers</p>
-          <h2 id="trusted-brands-heading" className="mt-1 text-xl sm:text-2xl font-black text-slate-900">Shop by Brand</h2>
+          <p className="text-[11px] sm:text-xs font-black uppercase tracking-[0.16em] text-teal-700">Trusted manufacturers</p>
+          <h2 id="trusted-brands-heading" className="mt-0.5 text-lg sm:text-2xl font-black text-slate-900">Shop by Brand</h2>
         </div>
         <span className="text-xs font-bold text-slate-500">{brands.length} brands</span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+      <div className="grid grid-cols-2 min-[460px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3">
         {brands.map((brand) => (
           <button
             key={brand.name}
             type="button"
             onClick={() => navigate(`/category/medicines?brand=${encodeURIComponent(brand.name)}`)}
-            className="group flex min-h-32 flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:border-teal-400 hover:shadow-lg"
+            className="group flex min-h-28 sm:min-h-32 flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:border-teal-400 hover:shadow-lg active:scale-95"
           >
             <span className="flex h-20 w-full items-center justify-center rounded-lg bg-white p-2">
               <img

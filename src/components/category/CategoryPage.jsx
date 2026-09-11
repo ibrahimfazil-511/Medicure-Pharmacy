@@ -25,6 +25,11 @@ export default function CategoryPage({
   const [searchQuery, setSearchQuery] = useState('');
   const categoryData = getCategoryData(categoryId);
   const selectedBrand = searchParams.get('brand')?.trim() || '';
+  const selectedSubcategory = searchParams.get('subcategory')?.trim() || '';
+
+  useEffect(() => {
+    setSearchQuery(selectedSubcategory);
+  }, [selectedSubcategory]);
 
   const categoryTitles = {
     'all': 'All Products',
@@ -100,11 +105,12 @@ export default function CategoryPage({
 
     const nameMatch = (item.name || '').toLowerCase().includes(q);
     const formulaMatch = (item.formula || '').toLowerCase().includes(q);
+    const categoryMatch = (item.category || '').toLowerCase().includes(q);
     const searchBrandMatch = (item.brand || '').toLowerCase().includes(q);
     const companyMatch = (item.company || '').toLowerCase().includes(q);
     const manufacturerMatch = (item.manufacturer || '').toLowerCase().includes(q);
 
-    return matchesCategory && (nameMatch || formulaMatch || searchBrandMatch || companyMatch || manufacturerMatch);
+    return matchesCategory && (nameMatch || formulaMatch || categoryMatch || searchBrandMatch || companyMatch || manufacturerMatch);
   });
 
   return (
@@ -121,11 +127,11 @@ export default function CategoryPage({
         showBackToHome
         hideSearch
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 w-full flex-1 space-y-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6 w-full flex-1 space-y-4">
         {/* Category Header Banner */}
-        <div className="soft-card p-5 sm:p-6 bg-gradient-to-r from-teal-50/80 via-[#e6edf5] to-[#f0f4f8] border border-white/90 shadow-lg rounded-2xl">
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 capitalize tracking-tight">
-            {categoryTitles[categoryId] || 'Category Products'}
+        <div className="soft-card p-4 sm:p-6 bg-gradient-to-r from-teal-50/80 via-[#e6edf5] to-[#f0f4f8] border border-white/90 shadow-md rounded-2xl">
+          <h1 className="text-xl sm:text-3xl font-black text-slate-900 capitalize tracking-tight">
+            {selectedSubcategory || categoryTitles[categoryId] || 'Category Products'}
           </h1>
         </div>
 
@@ -159,7 +165,7 @@ export default function CategoryPage({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {filteredMedicines.map((medicine) => (
               <MedicineCard
                 key={medicine.id}

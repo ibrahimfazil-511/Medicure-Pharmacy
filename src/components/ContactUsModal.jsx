@@ -42,26 +42,31 @@ export default function ContactUsModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="soft-card w-full max-w-2xl bg-[#f4f8f8] p-6 sm:p-8 relative border border-white max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div 
+        className="absolute inset-0" 
+        onClick={onClose} 
+      />
+      <div className="soft-card w-full max-w-2xl bg-[#f4f8f8] p-4 sm:p-6 md:p-8 relative border border-white rounded-2xl sm:rounded-3xl shadow-2xl max-h-[92dvh] overflow-y-auto z-10 no-scrollbar">
         
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900 active:scale-95 transition-all"
+          aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl soft-inset flex items-center justify-center text-teal-600 bg-teal-50">
-            <PhoneCall className="w-7 h-7" />
+        <div className="flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-6 pr-8">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl soft-inset flex items-center justify-center text-teal-600 bg-teal-50 shrink-0">
+            <PhoneCall className="w-5 h-5 sm:w-7 sm:h-7" />
           </div>
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-800">
               Contact MediCure Pharmacy
             </h2>
-            <p className="text-xs font-semibold text-slate-500">
+            <p className="text-[11px] sm:text-xs font-semibold text-slate-500">
               24/7 Qualified Pharmacist Hotline & Customer Support
             </p>
           </div>
@@ -136,7 +141,7 @@ export default function ContactUsModal({ isOpen, onClose }) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Full Name"
-                    className="w-full px-3 py-2 rounded-xl soft-inset-sm text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
 
@@ -148,7 +153,7 @@ export default function ContactUsModal({ isOpen, onClose }) {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Contact Number"
-                    className="w-full px-3 py-2 rounded-xl soft-inset-sm text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
 
@@ -160,14 +165,14 @@ export default function ContactUsModal({ isOpen, onClose }) {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Inquire about medicine availability, formula alternatives..."
-                    className="w-full px-3 py-2 rounded-xl soft-inset-sm text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                   ></textarea>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full soft-btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full soft-btn-primary py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99] transition-all"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{loading ? 'Sending...' : 'Send Inquiry'}</span>

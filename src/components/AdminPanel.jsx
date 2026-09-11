@@ -3,6 +3,7 @@ import { getSupabase } from '../services/supabaseClient';
 import { Package, ShoppingBag, FileText, Mail, Plus, Trash2, CheckCircle, ShieldCheck, LogOut, ArrowLeft, Percent, Upload, X, Edit3, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CustomerOrders from './CustomerOrders.jsx';
+import { CATEGORY_DATA } from '../data/categoryData.js';
 
 const supabase = getSupabase();
 
@@ -24,6 +25,7 @@ export default function AdminPanel() {
     formula: '',
     company: '',
     category: '',
+    subcategory: '',
     price: '',
     stock: '',
     discount: '',
@@ -90,6 +92,7 @@ export default function AdminPanel() {
       ['Medicine Name', newMed.name],
       ['Company Name', newMed.company],
       ['Category', newMed.category],
+      ['Subcategory', newMed.subcategory],
       ['Price', newMed.price],
       ['Stock Qty', newMed.stock],
       ['Description', newMed.description]
@@ -113,7 +116,7 @@ export default function AdminPanel() {
       name: newMed.name,
       formula: newMed.formula,
       company: newMed.company,
-      category: newMed.category,
+      category: `${newMed.category} / ${newMed.subcategory}`,
       price: parseFloat(newMed.price),
       stock: parseInt(newMed.stock),
       discount: newMed.discount ? parseFloat(newMed.discount) : 0,
@@ -130,7 +133,7 @@ export default function AdminPanel() {
       if (!error) {
         alert('Medicine updated successfully!');
         setEditingId(null);
-        setNewMed({ name: '', formula: '', company: '', category: '', price: '', stock: '', discount: '', image_url: '', description: '' });
+        setNewMed({ name: '', formula: '', company: '', category: '', subcategory: '', price: '', stock: '', discount: '', image_url: '', description: '' });
         fetchAdminData();
       } else {
         alert('Error updating medicine: ' + error.message);
@@ -140,7 +143,7 @@ export default function AdminPanel() {
 
       if (!error) {
         alert('Medicine added successfully!');
-        setNewMed({ name: '', formula: '', company: '', category: '', price: '', stock: '', discount: '', image_url: '', description: '' });
+        setNewMed({ name: '', formula: '', company: '', category: '', subcategory: '', price: '', stock: '', discount: '', image_url: '', description: '' });
         fetchAdminData();
       } else {
         alert('Error adding medicine: ' + error.message);
@@ -149,12 +152,14 @@ export default function AdminPanel() {
   };
 
   const handleEditClick = (med) => {
+    const [category, subcategory = ''] = (med.category || '').split(' / ');
     setEditingId(med.id);
     setNewMed({
       name: med.name || '',
       formula: med.formula || '',
       company: med.company || '',
-      category: med.category || '',
+      category,
+      subcategory,
       price: med.price || '',
       stock: med.stock || '',
       discount: med.discount || '',
@@ -166,8 +171,10 @@ export default function AdminPanel() {
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setNewMed({ name: '', formula: '', company: '', category: '', price: '', stock: '', discount: '', image_url: '', description: '' });
+    setNewMed({ name: '', formula: '', company: '', category: '', subcategory: '', price: '', stock: '', discount: '', image_url: '', description: '' });
   };
+
+  const selectedCategory = CATEGORY_DATA.find((category) => category.id === newMed.category);
 
   const handleDeleteMedicine = async (id) => {
     const { error } = await supabase.from('medicines').delete().eq('id', id);
@@ -226,10 +233,10 @@ export default function AdminPanel() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 bg-white/60 p-2 rounded-2xl border border-slate-200/60 backdrop-blur-sm">
+        <div className="flex overflow-x-auto no-scrollbar touch-scroll gap-1.5 sm:gap-2 bg-white/60 p-1.5 sm:p-2 rounded-2xl border border-slate-200/60 backdrop-blur-sm">
           <button
             onClick={() => setActiveTab('products')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${
               activeTab === 'products' 
                 ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' 
                 : 'bg-transparent text-slate-600 hover:bg-white/80 hover:text-teal-700'
@@ -239,7 +246,7 @@ export default function AdminPanel() {
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${
               activeTab === 'orders' 
                 ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' 
                 : 'bg-transparent text-slate-600 hover:bg-white/80 hover:text-teal-700'
@@ -249,7 +256,7 @@ export default function AdminPanel() {
           </button>
           <button
             onClick={() => setActiveTab('prescriptions')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${
               activeTab === 'prescriptions' 
                 ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' 
                 : 'bg-transparent text-slate-600 hover:bg-white/80 hover:text-teal-700'
@@ -259,7 +266,7 @@ export default function AdminPanel() {
           </button>
           <button
             onClick={() => setActiveTab('inquiries')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all relative ${
+            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all relative ${
               activeTab === 'inquiries' 
                 ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' 
                 : 'bg-transparent text-slate-600 hover:bg-white/80 hover:text-teal-700'
@@ -277,7 +284,7 @@ export default function AdminPanel() {
         {/* Tab Content: Manage Products */}
         {activeTab === 'products' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100 h-fit space-y-4">
+            <div className="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-slate-100 h-fit space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
                   <div className="p-2 rounded-xl bg-teal-50 text-teal-600">
@@ -300,7 +307,7 @@ export default function AdminPanel() {
                     placeholder="e.g. Panadol Extra"
                     value={newMed.name}
                     onChange={(e) => setNewMed({ ...newMed, name: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs outline-none text-slate-800"
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-2xl bg-slate-100 border border-slate-200 text-sm sm:text-xs outline-none text-slate-800"
                     required
                   />
                 </div>
@@ -312,7 +319,7 @@ export default function AdminPanel() {
                     placeholder="e.g. Paracetamol / Caffeine"
                     value={newMed.formula}
                     onChange={(e) => setNewMed({ ...newMed, formula: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs outline-none text-slate-800"
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-2xl bg-slate-100 border border-slate-200 text-sm sm:text-xs outline-none text-slate-800"
                     required
                   />
                 </div>
@@ -324,7 +331,7 @@ export default function AdminPanel() {
                     placeholder="e.g. GSK / Pfizer"
                     value={newMed.company}
                     onChange={(e) => setNewMed({ ...newMed, company: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs outline-none text-slate-800"
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-2xl bg-slate-100 border border-slate-200 text-sm sm:text-xs outline-none text-slate-800"
                     required
                   />
                 </div>
@@ -333,17 +340,32 @@ export default function AdminPanel() {
                   <label className="text-xs font-bold text-slate-700">Category</label>
                   <select
                     value={newMed.category}
-                    onChange={(e) => setNewMed({ ...newMed, category: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs outline-none text-slate-800"
+                    onChange={(e) => setNewMed({ ...newMed, category: e.target.value, subcategory: '' })}
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-2xl bg-slate-100 border border-slate-200 text-sm sm:text-xs outline-none text-slate-800"
                     required
                   >
                     <option value="" disabled>Select product category</option>
-                    <option value="medicines">Medicines</option>
-                    <option value="personal-care">Personal Care</option>
-                    <option value="baby-care">Baby Care</option>
-                    <option value="lifestyle">Lifestyle & Fitness</option>
-                    <option value="organic">Organic</option>
-                    <option value="devices">Healthcare Devices</option>
+                    {CATEGORY_DATA.map((category) => (
+                      <option key={category.id} value={category.id}>{category.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Subcategory</label>
+                  <select
+                    value={newMed.subcategory}
+                    onChange={(e) => setNewMed({ ...newMed, subcategory: e.target.value })}
+                    className="w-full px-3.5 py-2.5 sm:py-2 rounded-2xl bg-slate-100 border border-slate-200 text-sm sm:text-xs outline-none text-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={!selectedCategory}
+                    required
+                  >
+                    <option value="" disabled>
+                      {selectedCategory ? 'Select product subcategory' : 'Select category first'}
+                    </option>
+                    {selectedCategory?.subcategories.map((subcategory) => (
+                      <option key={subcategory} value={subcategory}>{subcategory}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -452,6 +474,7 @@ export default function AdminPanel() {
                     <th className="p-3 w-[100px]">Formula</th>
                     <th className="p-3 w-[80px]">Company</th>
                     <th className="p-3 w-[80px]">Category</th>
+                    <th className="p-3 w-[110px]">Subcategory</th>
                     <th className="p-3 w-[70px]">Price</th>
                     <th className="p-3 w-[70px]">Discount</th>
                     <th className="p-3 w-[70px]">Stock</th>
@@ -461,7 +484,7 @@ export default function AdminPanel() {
                 <tbody className="divide-y divide-slate-50">
                   {medicines.length === 0 ? (
                     <tr>
-                      <td colSpan="9" className="text-center py-8 text-slate-400">No medicines found in database.</td>
+                      <td colSpan="10" className="text-center py-8 text-slate-400">No medicines found in database.</td>
                     </tr>
                   ) : (
                     medicines.map((med) => (
@@ -481,7 +504,8 @@ export default function AdminPanel() {
                         <td className="p-3 font-bold text-slate-800 truncate" title={med.name}>{med.name}</td>
                         <td className="p-3 text-slate-500 truncate" title={med.formula}>{med.formula}</td>
                         <td className="p-3 text-slate-600 font-medium truncate" title={med.company}>{med.company || '-'}</td>
-                        <td className="p-3 text-slate-600 font-medium truncate" title={med.category}>{med.category || '-'}</td>
+                        <td className="p-3 text-slate-600 font-medium truncate" title={med.category}>{med.category?.split(' / ')[0] || '-'}</td>
+                        <td className="p-3 text-slate-600 font-medium truncate" title={med.category}>{med.category?.split(' / ')[1] || '-'}</td>
                         <td className="p-3 font-semibold text-teal-700 truncate">PKR {med.price}</td>
                         <td className="p-3 truncate">
                           {med.discount && Number(med.discount) > 0 ? (
@@ -634,18 +658,23 @@ export default function AdminPanel() {
 
       {/* Image Preview Modal */}
       {selectedImage && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="soft-card bg-white p-4 rounded-2xl max-w-2xl w-full relative shadow-2xl space-y-3">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div 
+            className="absolute inset-0"
+            onClick={() => setSelectedImage(null)}
+          />
+          <div className="soft-card bg-white p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl max-w-2xl w-full relative z-10 shadow-2xl space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-slate-700 truncate max-w-[90%] font-mono">{selectedImage}</h3>
               <button 
                 onClick={() => setSelectedImage(null)}
-                className="p-2 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 transition"
+                className="p-2 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 transition active:scale-95"
+                aria-label="Close"
               >
                 <X size={18} />
               </button>
             </div>
-            <div className="w-full max-h-[75vh] overflow-auto rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2">
+            <div className="w-full max-h-[75vh] overflow-auto rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 no-scrollbar">
               <img src={selectedImage} alt="Preview" className="max-w-full max-h-[70vh] object-contain rounded-xl" />
             </div>
           </div>
@@ -654,8 +683,12 @@ export default function AdminPanel() {
 
       {/* Inquiry Details Modal */}
       {selectedInquiry && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="soft-card bg-white p-6 rounded-2xl max-w-lg w-full relative shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div 
+            className="absolute inset-0"
+            onClick={() => setSelectedInquiry(null)}
+          />
+          <div className="soft-card bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl max-w-lg w-full relative z-10 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto no-scrollbar">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-sm font-black text-slate-900">Inquiry #{selectedInquiry.id}</h3>
@@ -663,7 +696,8 @@ export default function AdminPanel() {
               </div>
               <button 
                 onClick={() => setSelectedInquiry(null)}
-                className="p-2 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 transition"
+                className="p-2 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 transition active:scale-95"
+                aria-label="Close"
               >
                 <X size={18} />
               </button>
@@ -683,7 +717,7 @@ export default function AdminPanel() {
             <div className="pt-2 flex justify-end">
               <button 
                 onClick={() => setSelectedInquiry(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
+                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition active:scale-95"
               >
                 Close
               </button>

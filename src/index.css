@@ -95,6 +95,32 @@
   border-radius: 0.75rem;
 }
 
+.medicine-modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--clinic-teal) transparent;
+}
+
+.medicine-modal-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+
+.medicine-modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 1rem 0;
+}
+
+.medicine-modal-scroll::-webkit-scrollbar-thumb {
+  background: var(--clinic-teal);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.medicine-modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--clinic-teal-dark);
+  background-clip: padding-box;
+}
+
 .soft-inset {
   background: #f0f7f7;
   border: 1px solid #d7e9e8;
@@ -197,16 +223,36 @@ th {
     border-radius: 0.875rem;
   }
 
-  [class*="fixed inset-0"] {
-    padding: 0.75rem;
-  }
-
-  [class*="fixed inset-0"] > [class*="max-h-"] {
-    max-height: calc(100dvh - 1.5rem);
-  }
-
   table {
     font-size: 0.6875rem;
+  }
+}
+
+/* Hide scrollbars while allowing smooth touch scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent mobile iOS zoom on input focus */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 15px;
   }
 }
 

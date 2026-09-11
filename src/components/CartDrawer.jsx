@@ -107,18 +107,23 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
-        <div className="w-screen max-w-md soft-card bg-[#f4f8f8] p-4 sm:p-6 flex flex-col justify-between relative border-l border-white overflow-y-auto animate-in">
+      <div 
+        className="absolute inset-0" 
+        onClick={handleCloseAll}
+      />
+      <div className="absolute inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10 pointer-events-none">
+        <div className="w-screen max-w-full sm:max-w-md soft-card bg-[#f4f8f8] p-4 sm:p-6 flex flex-col justify-between relative border-l border-white overflow-y-auto animate-in h-full pointer-events-auto shadow-2xl">
           
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-300">
+          <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-300 shrink-0">
             <div className="flex items-center gap-2 min-w-0">
-              <ShoppingBag className="w-6 h-6 text-teal-600" />
+              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600 shrink-0" />
               <h2 className="text-base sm:text-lg font-extrabold text-slate-800 truncate">Your Pharmacy Cart</h2>
             </div>
             <button 
               onClick={handleCloseAll}
-              className="p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900"
+              className="p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900 active:scale-95 transition-all"
+              aria-label="Close cart"
             >
               <X className="w-5 h-5" />
             </button>
@@ -127,7 +132,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
           {!completedOrder ? (
             !isCheckingOut ? (
               /* Cart List View */
-              <div className="flex-1 overflow-y-auto py-4 space-y-4">
+              <div className="flex-1 overflow-y-auto py-3 sm:py-4 space-y-3 sm:space-y-4 no-scrollbar">
                 
                 {hasRx && (
                   <div className="p-3 rounded-xl bg-amber-100/90 text-amber-900 text-xs font-bold space-y-1 soft-inset-sm border border-amber-300">
@@ -143,7 +148,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                         onClose();
                         onOpenPrescription();
                       }}
-                      className="text-xs text-teal-800 underline font-bold pt-1 block"
+                      className="text-xs text-teal-800 underline font-bold pt-1 block hover:text-teal-950"
                     >
                       Upload Prescription Now &rarr;
                     </button>
@@ -151,8 +156,8 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                 )}
 
                 {cartItems.length === 0 ? (
-                  <div className="text-center py-16 space-y-3">
-                    <ShoppingBag className="w-16 h-16 text-slate-300 mx-auto" />
+                  <div className="text-center py-12 sm:py-16 space-y-3">
+                    <ShoppingBag className="w-14 h-14 sm:w-16 sm:h-16 text-slate-300 mx-auto" />
                     <p className="text-sm font-bold text-slate-600">Your cart is currently empty</p>
                     <p className="text-xs text-slate-400">Search medicine by name or formula to add items</p>
                   </div>
@@ -160,32 +165,34 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                   cartItems.map((item) => (
                     <div 
                       key={item.medicine.id}
-                      className="p-3 rounded-2xl soft-card bg-slate-100 flex items-center justify-between gap-3 border border-white"
+                      className="p-2.5 sm:p-3 rounded-2xl soft-card bg-slate-100 flex items-center justify-between gap-2.5 sm:gap-3 border border-white"
                     >
                       <img 
                         src={item.medicine.imageUrl} 
                         alt={item.medicine.name}
-                        className="w-14 h-14 rounded-xl object-cover soft-inset shrink-0"
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover soft-inset shrink-0"
                       />
 
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-bold text-slate-800 line-clamp-1">{item.medicine.name}</h4>
-                        <p className="text-[11px] text-teal-700 font-semibold line-clamp-1">{item.medicine.formula}</p>
+                        <h4 className="text-xs font-bold text-slate-800 truncate">{item.medicine.name}</h4>
+                        <p className="text-[11px] text-teal-700 font-semibold truncate">{item.medicine.formula}</p>
                         <span className="text-xs font-black text-slate-900">PKR {(item.medicine.price * item.quantity).toFixed(2)}</span>
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                         <div className="flex items-center rounded-lg soft-inset p-0.5">
                           <button
                             onClick={() => onUpdateQuantity(item.medicine.id, item.quantity - 1)}
-                            className="w-6 h-6 rounded font-bold text-slate-700 flex items-center justify-center text-xs"
+                            className="w-6 h-6 rounded font-bold text-slate-700 flex items-center justify-center text-xs active:bg-slate-200"
+                            aria-label="Decrease quantity"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
-                          <span className="w-6 text-center text-xs font-bold text-slate-800">{item.quantity}</span>
+                          <span className="w-5 sm:w-6 text-center text-xs font-bold text-slate-800">{item.quantity}</span>
                           <button
                             onClick={() => onUpdateQuantity(item.medicine.id, item.quantity + 1)}
-                            className="w-6 h-6 rounded font-bold text-slate-700 flex items-center justify-center text-xs"
+                            className="w-6 h-6 rounded font-bold text-slate-700 flex items-center justify-center text-xs active:bg-slate-200"
+                            aria-label="Increase quantity"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -193,7 +200,8 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
 
                         <button
                           onClick={() => onRemoveItem(item.medicine.id)}
-                          className="p-1.5 text-rose-500 hover:text-rose-700 rounded-lg"
+                          className="p-1.5 text-rose-500 hover:text-rose-700 active:scale-95 transition-all rounded-lg"
+                          aria-label="Remove item"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -205,12 +213,12 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
               </div>
             ) : (
               /* Checkout View - Wrapped in form to trigger HTML5 validation */
-              <form onSubmit={handlePlaceOrder} className="flex-1 overflow-y-auto py-4 space-y-4 flex flex-col justify-between">
-                <div className="space-y-4">
+              <form onSubmit={handlePlaceOrder} className="flex-1 overflow-y-auto py-3 sm:py-4 space-y-4 flex flex-col justify-between no-scrollbar">
+                <div className="space-y-3.5 sm:space-y-4">
                   <h3 className="text-sm font-extrabold text-slate-800">Delivery & Checkout Information</h3>
 
                   {orderError && (
-                    <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
+                    <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
                       <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                       <div>
                         <strong className="block font-bold">Failed to place order:</strong>
@@ -227,7 +235,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="e.g. Ibrahim Fazil"
-                      className="w-full px-3 py-2 rounded-xl soft-inset-sm text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
 
@@ -238,14 +246,14 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       placeholder="e.g. ibrahim@example.com"
-                      className="w-full px-3 py-2 rounded-xl soft-inset-sm text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number (For Rider) <span className="text-slate-400 font-normal">(Optional if email is provided)</span></label>
                     <div className="flex items-center rounded-xl soft-inset-sm bg-white focus-within:ring-2 focus-within:ring-teal-500">
-                      <span className="px-3 text-xs font-bold text-slate-600">+92</span>
+                      <span className="px-3 text-xs sm:text-sm font-bold text-slate-600 shrink-0">+92</span>
                       <input
                         type="tel"
                         inputMode="numeric"
@@ -254,7 +262,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                         placeholder="334 2850819"
                         pattern="3[0-9]{9}"
                         title="Enter a 10-digit Pakistani mobile number starting with 3"
-                        className="w-full rounded-r-xl bg-transparent px-3 py-2 text-xs focus:outline-none"
+                        className="w-full rounded-r-xl bg-transparent px-3 py-2.5 sm:py-2 text-sm sm:text-xs focus:outline-none"
                       />
                     </div>
                   </div>
@@ -267,7 +275,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
                       placeholder="House/Apartment #, Street, Sector/Area"
-                      className="w-full px-3 py-2 rounded-xl soft-inset-sm text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                     ></textarea>
                   </div>
 
@@ -277,7 +285,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                       required
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl soft-inset-sm text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className="w-full px-3.5 py-2.5 sm:py-2 rounded-xl soft-inset-sm text-sm sm:text-xs bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="">Select City</option>
                       <option value="Karachi">Karachi</option>
@@ -297,7 +305,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                         onClick={() => setPaymentMethod('Cash on Delivery')}
                         className={`p-2.5 rounded-xl text-center border transition-all ${
                           paymentMethod === 'Cash on Delivery' 
-                            ? 'soft-btn-primary border-teal-600' 
+                            ? 'soft-btn-primary border-teal-600 shadow-sm' 
                             : 'soft-btn text-slate-700'
                         }`}
                       >
@@ -308,7 +316,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                         onClick={() => setPaymentMethod('Card / Online')}
                         className={`p-2.5 rounded-xl text-center border transition-all ${
                           paymentMethod === 'Card / Online' 
-                            ? 'soft-btn-primary border-teal-600' 
+                            ? 'soft-btn-primary border-teal-600 shadow-sm' 
                             : 'soft-btn text-slate-700'
                         }`}
                       >
@@ -326,11 +334,11 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                   </button>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-4 shrink-0">
                   <button
                     type="submit"
                     disabled={placing}
-                    className="w-full soft-btn-primary py-3 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full soft-btn-primary py-3 sm:py-3.5 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99] transition-all"
                   >
                     <Truck className="w-4 h-4" />
                     <span>{placing ? 'Confirming Order...' : 'Confirm & Place Order'}</span>

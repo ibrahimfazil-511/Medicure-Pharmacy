@@ -10,104 +10,8 @@ import {
   X,
   ShieldCheck,
   Search,
-  Lock,
-  User,
   ArrowLeft
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-
-// Admin Login Modal Component
-function AdminLoginModal({ isOpen, onClose }) {
-  const [accountName, setAccountName] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
-
-  if (!isOpen) return null;
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (accountName === 'admin' && password === 'admin123') {
-      localStorage.setItem('isAdminLoggedIn', 'true');
-      setError('');
-      onClose();
-      navigate('/admin');
-    } else {
-      setError('Invalid credentials! Please check your username and password.');
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-6 border border-slate-100 my-auto">
-        <button 
-          type="button"
-          onClick={onClose} 
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 bg-slate-100 p-2 rounded-full transition z-10"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        <div className="text-center space-y-2 pt-2">
-          <div className="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center mx-auto shadow-inner">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <h2 className="text-xl font-black text-slate-900">Admin & Staff Portal</h2>
-          <p className="text-xs text-slate-500">Sign in securely to access the admin dashboard.</p>
-        </div>
-
-        {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-bold text-center">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-700">Account Name</label>
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200">
-              <User className="w-4 h-4 text-slate-400 shrink-0" />
-              <input 
-                type="text" 
-                required
-                name="custom_account_name"
-                autoComplete="off"
-                placeholder="Enter account name"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-                className="bg-transparent border-none outline-none text-xs w-full text-slate-800"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-700">Password</label>
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-100 border border-slate-200">
-              <Lock className="w-4 h-4 text-slate-400 shrink-0" />
-              <input 
-                type="password" 
-                required
-                name="custom_password"
-                autoComplete="new-password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-transparent border-none outline-none text-xs w-full text-slate-800"
-              />
-            </div>
-          </div>
-
-          <button 
-            type="submit" 
-            className="w-full py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-lg transition"
-          >
-            Sign In to Dashboard
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 export default function Navbar({
   onOpenPrescription,
@@ -122,6 +26,7 @@ export default function Navbar({
   hideSearch = false
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false); // FIXED: Added missing state
 
   return (
     <>
@@ -203,18 +108,30 @@ export default function Navbar({
             </nav>
 
             {/* Product Search and Right Action Buttons */}
-            <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-              {!hideSearch && <label className="hidden md:flex w-40 lg:w-56 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-teal-400 focus-within:bg-white">
-                <Search className="h-4 w-4 shrink-0 text-slate-400" />
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search products..."
-                  aria-label="Search products"
-                  className="w-full bg-transparent text-xs font-semibold text-slate-700 outline-none placeholder:text-slate-400"
-                />
-              </label>}
+            <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
+              {!hideSearch && (
+                <>
+                  <label className="hidden md:flex w-40 lg:w-60 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-teal-400 focus-within:bg-white transition-colors">
+                    <Search className="h-4 w-4 shrink-0 text-slate-400" />
+                    <input
+                      type="search"
+                      value={searchQuery || ''}
+                      onChange={(event) => setSearchQuery(event.target.value)}
+                      placeholder="Search medicines..."
+                      aria-label="Search products"
+                      className="w-full bg-transparent text-xs font-semibold text-slate-700 outline-none placeholder:text-slate-400"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                    aria-label="Search"
+                    className="md:hidden p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-teal-600 shadow-sm transition active:scale-95"
+                  >
+                    <Search className="w-4 h-4" />
+                  </button>
+                </>
+              )}
 
               {/* Contact Us Button */}
               <button
@@ -228,12 +145,12 @@ export default function Navbar({
               {/* Cart Drawer Toggle Button */}
               <button
                 onClick={onOpenCart}
-                className="relative p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-teal-600 shadow-sm transition-all hover:bg-slate-50"
+                className="relative p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-teal-600 shadow-sm transition-all hover:bg-slate-50 active:scale-95"
                 aria-label="Shopping Cart"
               >
                 <ShoppingBag className="w-4 h-4 text-slate-800" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-bold text-[10px] rounded-full flex items-center justify-center shadow-md animate-bounce">
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-black text-[10px] rounded-full flex items-center justify-center shadow-md animate-bounce">
                     {cartCount}
                   </span>
                 )}
@@ -243,7 +160,7 @@ export default function Navbar({
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle Menu"
-                className="lg:hidden p-2 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm"
+                className="lg:hidden p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm active:scale-95 transition"
               >
                 {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </button>
@@ -252,20 +169,50 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Mobile Drawer Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden px-4 pt-3 pb-5 bg-white/95 backdrop-blur-md border-b border-slate-200 space-y-2 shadow-xl animate-in slide-in-from-top-2">
-            {!hideSearch && <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 focus-within:border-teal-400 focus-within:bg-white">
-              <Search className="h-4 w-4 shrink-0 text-slate-400" />
+        {/* Mobile Quick Search Bar (when opened via icon) */}
+        {!hideSearch && mobileSearchOpen && (
+          <div className="md:hidden px-3 py-2.5 bg-slate-50 border-t border-slate-200 animate-in slide-in-from-top-1">
+            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:border-teal-400 shadow-sm">
+              <Search className="h-4 w-4 shrink-0 text-teal-600" />
               <input
                 type="search"
-                value={searchQuery}
+                autoFocus
+                value={searchQuery || ''}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search all products..."
+                placeholder="Search by brand, medicine or formula..."
                 aria-label="Search all products"
-                className="w-full bg-transparent text-xs font-semibold text-slate-700 outline-none placeholder:text-slate-400"
+                className="w-full bg-transparent text-xs font-semibold text-slate-800 outline-none placeholder:text-slate-400"
               />
-            </label>}
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="p-1 text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </label>
+          </div>
+        )}
+
+        {/* Mobile Drawer Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden px-3 pt-3 pb-5 bg-white/98 backdrop-blur-md border-b border-slate-200 space-y-2 shadow-xl animate-in slide-in-from-top-2">
+            {!hideSearch && (
+              <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 focus-within:border-teal-400 focus-within:bg-white mb-3">
+                <Search className="h-4 w-4 shrink-0 text-slate-400" />
+                <input
+                  type="search"
+                  value={searchQuery || ''}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search medicines or formula..."
+                  aria-label="Search all products"
+                  className="w-full bg-transparent text-xs font-semibold text-slate-700 outline-none placeholder:text-slate-400"
+                />
+              </label>
+            )}
+
             {showBackToHome && (
               <button
                 type="button"
@@ -279,16 +226,6 @@ export default function Navbar({
                 Back to Home
               </button>
             )}
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenContactUs();
-              }}
-              className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 md:hidden"
-            >
-              <PhoneCall className="w-4 h-4 text-teal-600" />
-              Contact Us
-            </button>
 
             <button
               onClick={() => {
@@ -297,10 +234,10 @@ export default function Navbar({
                 if (element) element.scrollIntoView({ behavior: 'smooth' });
                 if (onCategoryClick) onCategoryClick('All');
               }}
-              className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50"
+              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition"
             >
               <Pill className="w-4 h-4 text-teal-600" />
-              Shop by Category
+              <span>Shop by Category</span>
             </button>
 
             <button
@@ -308,10 +245,10 @@ export default function Navbar({
                 setMobileMenuOpen(false);
                 onOpenPrescription();
               }}
-              className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50"
+              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition"
             >
               <FileText className="w-4 h-4 text-emerald-600" />
-              Prescription Upload
+              <span>Prescription Upload</span>
             </button>
 
             <button
@@ -319,15 +256,25 @@ export default function Navbar({
                 setMobileMenuOpen(false);
                 onOpenTrackOrder();
               }}
-              className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50"
+              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition"
             >
               <Truck className="w-4 h-4 text-blue-600" />
-              Track Order
+              <span>Track Order Status</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onOpenContactUs();
+              }}
+              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition"
+            >
+              <PhoneCall className="w-4 h-4 text-teal-600" />
+              <span>Contact Us & Helpline</span>
             </button>
           </div>
         )}
       </header>
-
     </>
   );
 }

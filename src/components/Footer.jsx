@@ -11,14 +11,14 @@ import {
 
 export default function Footer({ onOpenAdminPortal, onOpenPrescription, onOpenTrackOrder, onOpenContactUs, onOpenLegal }) {
   return (
-    <footer className="bg-[#eaf3f3] text-slate-700 pt-10 sm:pt-16 pb-8 border-t border-[#d9e6e7]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="bg-[#eaf3f3] text-slate-700 pt-8 sm:pt-16 pb-8 border-t border-[#d9e6e7]">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         
         {/* Top Main Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 pb-10 sm:pb-12 border-b border-slate-300 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-12 pb-8 sm:pb-12 border-b border-slate-300 items-start">
           
           {/* Column 1: Brand Info & License Badge */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3.5 sm:gap-4">
             {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-200 flex items-center justify-center">

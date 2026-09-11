@@ -33,26 +33,30 @@ export default function LegalModal({ type, onClose }) {
   const Icon = policy.icon;
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-      <section role="dialog" aria-modal="true" aria-labelledby="legal-modal-title" className="relative max-h-[90vh] w-full max-w-2xl overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-2xl">
-        <header className="flex items-center justify-between border-b border-slate-200 px-5 py-4 sm:px-7">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-100 text-teal-700">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/60 p-2.5 sm:p-4 backdrop-blur-sm animate-in fade-in duration-200">
+      <div 
+        className="absolute inset-0" 
+        onClick={onClose} 
+      />
+      <section role="dialog" aria-modal="true" aria-labelledby="legal-modal-title" className="relative z-10 max-h-[92dvh] w-full max-w-2xl overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-100 bg-white shadow-2xl">
+        <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3.5 sm:px-7 sm:py-4">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-teal-100 text-teal-700 shrink-0">
               <Icon className="h-5 w-5" />
             </div>
-            <h2 id="legal-modal-title" className="text-lg font-black text-slate-900">{policy.title}</h2>
+            <h2 id="legal-modal-title" className="text-base sm:text-lg font-black text-slate-900">{policy.title}</h2>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close" className="rounded-full bg-slate-100 p-2 text-slate-500 transition hover:text-slate-900">
+          <button type="button" onClick={onClose} aria-label="Close" className="rounded-full bg-slate-100 p-2 text-slate-500 transition hover:text-slate-900 active:scale-95">
             <X className="h-5 w-5" />
           </button>
         </header>
 
-        <div className="max-h-[calc(90vh-76px)] space-y-5 overflow-y-auto px-5 py-6 sm:px-7">
-          <p className="text-sm leading-6 text-slate-600">MediCure Pharmacy values clear, responsible, and secure healthcare service.</p>
+        <div className="max-h-[calc(92dvh-76px)] space-y-4 sm:space-y-5 overflow-y-auto px-4 py-5 sm:px-7 sm:py-6 no-scrollbar">
+          <p className="text-xs sm:text-sm leading-6 text-slate-600">MediCure Pharmacy values clear, responsible, and secure healthcare service.</p>
           {policy.sections.map(([heading, text]) => (
             <div key={heading}>
-              <h3 className="text-sm font-black text-slate-900">{heading}</h3>
-              <p className="mt-1 text-sm leading-6 text-slate-600">{text}</p>
+              <h3 className="text-xs sm:text-sm font-black text-slate-900">{heading}</h3>
+              <p className="mt-1 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">{text}</p>
             </div>
           ))}
         </div>
