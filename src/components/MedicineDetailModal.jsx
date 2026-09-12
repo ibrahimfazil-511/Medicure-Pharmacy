@@ -34,8 +34,8 @@ export default function MedicineDetailModal({ medicine, onClose, onAddToCart }) 
           
           {/* Left Column: Image & Status */}
           <div className="flex flex-col gap-3 sm:gap-4 bg-[#eff9f7] p-4 sm:p-6 md:p-8">
-            <div className="relative flex aspect-[4/3] sm:aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-teal-100 bg-white p-4 shadow-sm sm:p-6">
-              <span className="absolute left-3 top-3 rounded-full bg-teal-50 px-2.5 py-0.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-teal-700">
+            <div className="relative flex aspect-[4/3] sm:aspect-square w-full items-center justify-center rounded-2xl border border-teal-100 bg-white p-6 pt-10 shadow-sm sm:p-8 sm:pt-10">
+              <span className="absolute left-3 top-3 z-10 rounded-full bg-teal-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-teal-700 ring-1 ring-inset ring-teal-200">
                 Product view
               </span>
               <img 
@@ -131,15 +131,15 @@ export default function MedicineDetailModal({ medicine, onClose, onAddToCart }) 
             )}
 
             {/* Sticky Action Footer Bar */}
-            <div className="mt-auto sticky bottom-0 z-20 flex items-center justify-between gap-3 rounded-2xl bg-[#06645f] p-3 sm:p-4 text-white shadow-xl shadow-teal-950/20">
-              <div className="min-w-0">
+            <div className="mt-auto sticky bottom-0 z-20 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 rounded-2xl bg-[#06645f] p-3 sm:p-4 text-white shadow-xl shadow-teal-950/20">
+              <div className="shrink-0 min-w-0">
                 <span className="block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-teal-200">Total Price</span>
-                <span className="text-base sm:text-xl font-black tracking-tight truncate block">
-                  PKR {Number((medicine.price || 0) * quantity).toLocaleString()}
+                <span className="text-sm sm:text-lg md:text-xl font-black tracking-tight whitespace-nowrap block">
+                  PKR {Number((medicine.price || 0) * quantity).toLocaleString('en-PK', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                 </span>
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0 ml-auto sm:ml-0">
                 {/* Quantity Controls */}
                 <div className="flex items-center gap-0.5 rounded-xl bg-white/15 p-1">
                   <button 
@@ -162,12 +162,12 @@ export default function MedicineDetailModal({ medicine, onClose, onAddToCart }) 
                 {/* Add to Cart Button */}
                 <button
                   onClick={handleAdd}
-                  className={`flex items-center gap-1.5 rounded-xl px-3.5 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95 ${
+                  className={`flex items-center gap-1 rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold shadow-md transition-all active:scale-95 shrink-0 ${
                     added ? 'bg-emerald-500 text-white' : 'bg-white text-teal-900 hover:bg-teal-50'
                   }`}
                 >
-                  {added ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
-                  <span>{added ? 'Added!' : 'Add to Cart'}</span>
+                  {added ? <Check className="h-3.5 w-3.5 shrink-0" /> : <ShoppingBag className="h-3.5 w-3.5 shrink-0" />}
+                  <span className="whitespace-nowrap">{added ? 'Added!' : 'Add to Cart'}</span>
                 </button>
               </div>
             </div>
