@@ -12,7 +12,6 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('Karachi');
-  const [paymentMethod, setPaymentMethod] = useState('Cash on Delivery');
   const [placing, setPlacing] = useState(false);
   const [orderError, setOrderError] = useState(null);
   const [completedOrder, setCompletedOrder] = useState(null);
@@ -53,7 +52,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
       subtotal,
       shippingFee: shippingFee !== null ? shippingFee : 0,
       total,
-      paymentMethod,
+      paymentMethod: 'Cash on Delivery',
       trackingId,
       createdAt: new Date().toLocaleString()
     };
@@ -297,31 +296,12 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                     </select>
                   </div>
 
+                  {/* Payment Method — Only Cash on Delivery */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">Payment Method</label>
-                    <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('Cash on Delivery')}
-                        className={`p-2.5 rounded-xl text-center border transition-all ${
-                          paymentMethod === 'Cash on Delivery' 
-                            ? 'soft-btn-primary border-teal-600 shadow-sm' 
-                            : 'soft-btn text-slate-700'
-                        }`}
-                      >
-                        Cash on Delivery
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('Card / Online')}
-                        className={`p-2.5 rounded-xl text-center border transition-all ${
-                          paymentMethod === 'Card / Online' 
-                            ? 'soft-btn-primary border-teal-600 shadow-sm' 
-                            : 'soft-btn text-slate-700'
-                        }`}
-                      >
-                        Credit/Debit Card
-                      </button>
+                    <div className="p-3 rounded-xl soft-inset-sm bg-teal-50 border border-teal-200 text-xs font-bold text-teal-800 flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-teal-600 shrink-0" />
+                      <span>Cash on Delivery — Pay when your order arrives</span>
                     </div>
                   </div>
 
@@ -366,7 +346,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Payment:</span>
-                  <span className="text-slate-800 font-bold">{completedOrder.paymentMethod}</span>
+                  <span className="text-slate-800 font-bold">Cash on Delivery</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Estimated Arrival:</span>

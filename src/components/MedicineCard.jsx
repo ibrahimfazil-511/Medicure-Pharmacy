@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pill, ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart, Star } from 'lucide-react';
 
 export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
   if (!medicine) return null;
@@ -8,6 +8,9 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
   const price = Number(medicine.price) || 0;
   const originalPrice = Number(medicine.originalPrice) || 0;
   const hasDiscount = discount > 0 || originalPrice > price;
+
+  const ratingValue = Number(medicine.rating) || 0;
+  const hasRating = ratingValue > 0;
 
   return (
     <div
@@ -44,17 +47,13 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
             <h3 className="text-xs sm:text-sm md:text-base font-bold leading-tight text-slate-900 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
               {medicine.name}
             </h3>
-            {medicine.rating && (
+            {hasRating && (
               <span className="flex shrink-0 items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-amber-600">
-                <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-amber-400 text-amber-400" /> {medicine.rating}
+                <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-amber-400 text-amber-400" />
+                {ratingValue.toFixed(1)}
               </span>
             )}
           </div>
-          {medicine.formula && (
-            <p className="text-[10px] sm:text-xs font-semibold text-teal-700 truncate mt-0.5">
-              {medicine.formula}
-            </p>
-          )}
         </div>
 
         {/* Price and Add to Cart Action */}
@@ -70,9 +69,6 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
                 </span>
               )}
             </div>
-            <span className="text-[9px] sm:text-[10px] font-bold text-emerald-600 block truncate">
-              {medicine.stock > 0 ? `In Stock` : 'Out of Stock'}
-            </span>
           </div>
 
           <button

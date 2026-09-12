@@ -90,8 +90,8 @@ function mapMedicineRow(item) {
     description: item.description || '',
     requiresPrescription: !!item.requires_prescription,
     imageUrl: item.image_url || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80',
-    rating: Number(item.rating) || 4.8,
-    reviewsCount: item.reviews_count || 50,
+    rating: Number(item.rating) || 0,
+    reviewsCount: item.reviews_count || 0,
     isPopular: !!item.is_popular,
     usageInstructions: item.usage_instructions || 'Take as directed by doctor',
     sideEffects: item.side_effects || 'None specified',
@@ -139,6 +139,132 @@ export async function fetchMedicineByName(name) {
     return { data: null, source: 'Unavailable' };
   }
 }
+
+// ============================================================
+// LIVE RATINGS — REVIEWS SYSTEM
+// ============================================================
+
+/**
+ * Fetch average rating + review count for ONE medicine.
+ * Returns { avg_rating: number, review_count: number }
+ */
+export async function fetchMedicineRating(medicineId) {
+  if (!medicineId) return { avg_rating: 0, review_count: 0 };
+  try {
+    const client = getSupabase();
+    const { data, error } = await client
+      .from('medicine_ratings')
+      .select('avg_rating, review_count')
+      .eq('medicine_id', medicineId)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('[fetchMedicineRating]', error.message);
+      return { avg_rating: 0, review_count: 0 };
+    }
+    return {
+      avg_rating: Number(data?.avg_rating) || 0,
+      review_count: Number(data?.review_count) || 0,
+    };
+  } catch (err) {
+    console.warn('[fetchMedicineRating] Exception:', err.message);
+    return { avg_rating: 0, review_count: 0 };
+  }
+}
+
+/**
+ * Fetch ratings for MANY medicines at once (1 query instead of N).
+ * Pass an array of IDs → returns map: { [id]: { avg_rating, review_count } }
+ */
+export async function fetchMedicineRatingsBulk(medicineIds = []) {
+  if (!Array.isArray(medicineIds) || medicineIds.length === 0) return {};
+  try {
+    const client = getSupabase();
+    const { data, error } = await client
+      .from('medicine_ratings')
+      .select('medicine_id, avg_rating, review_count')
+      .in('medicine_id', medicineIds);
+
+    if (error) {
+      console.warn('[fetchMedicineRatingsBulk]', error.message);
+      return {};
+    }
+
+    const map = {};
+    (data || []).forEach((row) => {
+      map[row.medicine_id] = {
+        avg_rating: Number(row.avg_rating) || 0,
+        review_count: Number(row.review_count) || 0,
+      };
+    });
+    return map;
+  } catch (err) {
+    console.warn('[fetchMedicineRatingsBulk] Exception:', err.message);
+    return {};
+  }
+}
+
+/**
+ * Submit a new review for a medicine.
+ */
+export async function submitReview({ medicineId, userName, rating, reviewText }) {
+  if (!medicineId || !rating) {
+    return { success: false, error: 'Medicine ID and rating are required.' };
+  }
+  try {
+    const client = getSupabase();
+    const { data, error } = await client
+      .from('reviews')
+      .insert([
+        {
+          medicine_id: medicineId,
+          user_name: (userName || '').trim() || 'Anonymous',
+          rating: Number(rating),
+          review_text: (reviewText || '').trim() || null,
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[submitReview]', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  } catch (err) {
+    console.error('[submitReview] Exception:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Fetch all reviews for a medicine (latest first).
+ */
+export async function fetchMedicineReviews(medicineId, limit = 20) {
+  if (!medicineId) return [];
+  try {
+    const client = getSupabase();
+    const { data, error } = await client
+      .from('reviews')
+      .select('id, user_name, rating, review_text, created_at')
+      .eq('medicine_id', medicineId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.warn('[fetchMedicineReviews]', error.message);
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    console.warn('[fetchMedicineReviews] Exception:', err.message);
+    return [];
+  }
+}
+
+// ============================================================
+// SEEDING
+// ============================================================
 
 // Seed medicines into Supabase table
 export async function seedSupabaseMedicines() {
@@ -349,12 +475,49 @@ CREATE TABLE IF NOT EXISTS orders (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
--- 4. Enable RLS & Policies
+-- 4. Enable RLS & Policies for Medicines
 ALTER TABLE medicines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE medicines ADD COLUMN IF NOT EXISTS discount NUMERIC(5,2) DEFAULT 0;
 CREATE POLICY "Public Read Access for Medicines" ON medicines FOR SELECT USING (true);
 CREATE POLICY "Public Insert Access for Medicines" ON medicines FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Access for Medicines" ON medicines FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Public Delete Access for Medicines" ON medicines FOR DELETE USING (true);
+
+-- ============================================================
+-- 5. LIVE REVIEWS / RATINGS SYSTEM  (NEW)
+-- ============================================================
+
+-- 5a. Reviews table — one row per review
+CREATE TABLE IF NOT EXISTS reviews (
+  id           BIGSERIAL PRIMARY KEY,
+  medicine_id  TEXT NOT NULL REFERENCES medicines(id) ON DELETE CASCADE,
+  user_name    TEXT NOT NULL DEFAULT 'Anonymous',
+  rating       SMALLINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  review_text  TEXT,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_medicine_id ON reviews(medicine_id);
+
+-- 5b. Aggregated view: avg_rating + review_count per medicine
+CREATE OR REPLACE VIEW medicine_ratings AS
+SELECT
+  medicine_id,
+  ROUND(AVG(rating)::numeric, 1) AS avg_rating,
+  COUNT(*)::int                  AS review_count
+FROM reviews
+GROUP BY medicine_id;
+
+-- 5c. RLS for reviews (public read, public insert, no update/delete from anon)
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can read reviews" ON reviews;
+DROP POLICY IF EXISTS "Public can insert reviews" ON reviews;
+
+CREATE POLICY "Public can read reviews"
+  ON reviews FOR SELECT USING (true);
+
+CREATE POLICY "Public can insert reviews"
+  ON reviews FOR INSERT WITH CHECK (true);
 `;
 }

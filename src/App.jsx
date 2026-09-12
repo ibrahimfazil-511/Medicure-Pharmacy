@@ -502,8 +502,6 @@
 
 
 
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
@@ -584,8 +582,8 @@ function StoreFront({
       const itemCat = (item.category || '').toLowerCase().trim();
       const selectedCat = (selectedCategory || '').toLowerCase().trim();
 
-      const isAllCategory = 
-        selectedCat === 'all' || 
+      const isAllCategory =
+        selectedCat === 'all' ||
         selectedCat === 'all products';
 
       const isMedicineCategory = selectedCat === 'medicines' && (
@@ -596,12 +594,12 @@ function StoreFront({
         itemCat.includes('syrup')
       );
 
-      const categoryMatch = 
+      const categoryMatch =
         isAllCategory ||
         isMedicineCategory ||
         !itemCat ||
         itemCat === selectedCat ||
-        itemCat.replace(/s$/, '') === selectedCat.replace(/s$/, '') || 
+        itemCat.replace(/s$/, '') === selectedCat.replace(/s$/, '') ||
         itemCat.includes(selectedCat) ||
         selectedCat.includes(itemCat);
 
@@ -678,7 +676,7 @@ function StoreFront({
           ) : filteredMedicines.length === 0 ? (
             <div className="text-center py-12 soft-card bg-white/50">
               <p className="text-slate-600 font-bold">No products found matching your criteria.</p>
-              <button 
+              <button
                 onClick={() => { setSelectedCategory(''); setSearchQuery(''); }}
                 className="mt-3 text-sm text-teal-700 font-extrabold underline"
               >
@@ -714,14 +712,14 @@ function StoreFront({
 
         <BrandShowcase />
 
-      </main> 
+      </main>
 
       {/* FULLY RESPONSIVE BANNERS SECTION (NO CROP) */}
       <section className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
         <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-4 sm:mb-6">
           Special Offers & Discounts
         </h2>
-        
+
         <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {/* Banner 1 */}
           <div className="w-full bg-slate-100 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -783,11 +781,24 @@ function StoreFront({
         </a>
       </div>
 
-      {/* Modals & Drawers */}
+      {/* ===================================================== */}
+      {/* Modals & Drawers                                      */}
+      {/* ===================================================== */}
+
+      {/* MedicineDetailModal — navbar handlers wired so all buttons work */}
       <MedicineDetailModal
         medicine={selectedMedicine}
         onClose={() => setSelectedMedicine(null)}
         onAddToCart={(med, qty) => onAddToCart(med, qty)}
+        // Navbar handlers inside the modal
+        onOpenPrescription={onOpenPrescription}
+        onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
+        onOpenContactUs={() => setIsContactUsOpen(true)}
+        onOpenCart={() => setIsCartOpen(true)}
+        cartCount={totalCartCount}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onCategoryClick={(cat) => setSelectedCategory(cat)}
       />
 
       <TrackOrderModal
@@ -800,15 +811,14 @@ function StoreFront({
         onClose={() => setIsContactUsOpen(false)}
       />
 
-      <Footer
-        onOpenPrescription={onOpenPrescription}
-        onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
-        onOpenContactUs={() => setIsTrackOrderOpen(true)}
-        onOpenAdminPortal={onOpenAdminPortal}
-        onOpenLegal={setLegalModal}
-        onCategoryClick={(cat) => setSelectedCategory(cat)}
-      />
-
+    <Footer
+  onOpenPrescription={onOpenPrescription}
+  onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
+  onOpenContactUs={() => setIsContactUsOpen(true)}
+  onOpenAdminPortal={onOpenAdminPortal}
+  onOpenLegal={setLegalModal}
+  onCategoryClick={(cat) => setSelectedCategory(cat)}
+/>
       <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />
 
     </div>
@@ -823,6 +833,10 @@ export default function App() {
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [completedOrder, setCompletedOrder] = useState(null);
 
+  // Track order & Contact modals (hoisted so category page & modal can use them)
+  const [isTrackOrderOpen, setIsTrackOrderOpen] = useState(false);
+  const [isContactUsOpen, setIsContactUsOpen] = useState(false);
+
   const handleAddToCart = (medicine, qty = 1) => {
     setCartItems((prev) => {
       const existingIndex = prev.findIndex((i) => i.medicine.id === medicine.id);
@@ -833,7 +847,7 @@ export default function App() {
       }
       return [...prev, { medicine, quantity: qty }];
     });
-    setIsCartOpen(true); 
+    setIsCartOpen(true);
   };
 
   const handleUpdateQuantity = (medicineId, newQty) => {
@@ -870,10 +884,10 @@ export default function App() {
             />
           ) : <Navigate to="/" replace />}
         />
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
-            <StoreFront 
+            <StoreFront
               cartItems={cartItems}
               onAddToCart={handleAddToCart}
               onUpdateQuantity={handleUpdateQuantity}
@@ -885,10 +899,10 @@ export default function App() {
               onOpenPrescription={() => setIsPrescriptionOpen(true)}
               onOpenAdminPortal={() => setIsAdminLoginOpen(true)}
             />
-          } 
+          }
         />
-        <Route 
-          path="/category/:categoryId" 
+        <Route
+          path="/category/:categoryId"
           element={
             <CategoryPage
               onAddToCart={handleAddToCart}
