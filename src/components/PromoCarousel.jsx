@@ -406,7 +406,7 @@ export default function PromoCarousel({ onOrderNow }) {
         <button type="button" className="promo-arrow promo-arrow-right" onClick={() => showSlide(activeSlide + 1)} aria-label="Next promotion"><ChevronRight size={22} /></button>
         <div className="promo-dots" role="tablist" aria-label="Choose promotion">{slides.map((item, index) => <button key={item.art} type="button" className={index === activeSlide ? 'active' : ''} onClick={() => showSlide(index)} aria-label={`Promotion ${index + 1}`} aria-selected={index === activeSlide} role="tab" />)}</div>
       </div>
-      <p className="promo-contact"><a href="https://wa.me/923342850819?text=Hello%20MediCure%20Pharmacy%2C%20I%20want%20to%20place%20an%20order." target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" title="Chat on WhatsApp"><FaWhatsapp size={25} /><span>WhatsApp</span><b>+92 334 2850819</b></a></p>
+      {/* <p className="promo-contact"><a href="https://wa.me/923342850819?text=Hello%20MediCure%20Pharmacy%2C%20I%20want%20to%20place%20an%20order." target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" title="Chat on WhatsApp"><FaWhatsapp size={25} /><span>WhatsApp</span><b>+92 334 2850819</b></a></p> */}
       <style>{promoStyles}</style>
     </section>
   );
