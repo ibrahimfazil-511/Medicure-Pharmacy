@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import logoImg from '../assets/images/medicure_pharmacy_logo_1786426208570.jpg';
 import {
@@ -26,7 +27,7 @@ export default function Navbar({
   hideSearch = false
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false); // FIXED: Added missing state
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   return (
     <>
@@ -34,47 +35,50 @@ export default function Navbar({
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
 
-            {/* Logo & Brand Name */}
-            <div 
-              className="flex items-center space-x-2 cursor-pointer min-w-0 shrink-0" 
-              onClick={() => {
-                if (showBackToHome) {
-                  window.location.href = import.meta.env.BASE_URL || '/';
-                  return;
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-            >
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-white shadow-sm shadow-teal-500/10 overflow-hidden border border-slate-100 p-0.5 shrink-0">
-                <img src={logoImg} alt="MediCure Pharmacy Logo" className="w-full h-full object-cover rounded-lg" referrerPolicy="no-referrer" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm sm:text-lg font-black tracking-tight text-slate-900 truncate">
-                    Medi<span className="text-teal-600">Cure</span>
-                  </span>
-                  <span className="hidden xl:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800">
-                    <ShieldCheck className="w-2.5 h-2.5 mr-1 text-teal-600" /> Rx
-                  </span>
+            {/* Logo & Brand Name (With optional Back Button) */}
+            <div className="flex items-center gap-2 min-w-0 shrink-0">
+              {showBackToHome && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.location.href = import.meta.env.BASE_URL || '/';
+                  }}
+                  aria-label="Back to Home"
+                  title="Back to Home"
+                  className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-100 hover:bg-teal-100 text-slate-700 hover:text-teal-700 transition active:scale-95 shrink-0"
+                >
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              )}
+
+              <div
+                className="flex items-center space-x-2 cursor-pointer min-w-0 shrink-0"
+                onClick={() => {
+                  if (showBackToHome) {
+                    window.location.href = import.meta.env.BASE_URL || '/';
+                    return;
+                  }
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-white shadow-sm shadow-teal-500/10 overflow-hidden border border-slate-100 p-0.5 shrink-0">
+                  <img src={logoImg} alt="MediCure Pharmacy Logo" className="w-full h-full object-cover rounded-lg" referrerPolicy="no-referrer" />
                 </div>
-                <p className="text-[9px] sm:text-[11px] font-semibold text-slate-500 tracking-tight truncate leading-none">
-                  24/7 Verified Store
-                </p>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm sm:text-lg font-black tracking-tight text-slate-900 truncate">
+                      Medi<span className="text-teal-600">Cure</span>
+                    </span>
+                    <span className="hidden xl:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800">
+                      <ShieldCheck className="w-2.5 h-2.5 mr-1 text-teal-600" /> Rx
+                    </span>
+                  </div>
+                  <p className="text-[9px] sm:text-[11px] font-semibold text-slate-500 tracking-tight truncate leading-none">
+                    24/7 Verified Store
+                  </p>
+                </div>
               </div>
             </div>
-
-            {showBackToHome && (
-              <button
-                type="button"
-                onClick={() => {
-                  window.location.href = import.meta.env.BASE_URL || '/';
-                }}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-teal-200 bg-teal-50 text-xs font-bold text-teal-800 hover:bg-teal-100 transition"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Back to Home
-              </button>
-            )}
 
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center space-x-1 bg-slate-200/60 p-1 rounded-xl border border-slate-300/40 shadow-inner shrink-0">
@@ -165,11 +169,10 @@ export default function Navbar({
                 {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </button>
             </div>
-
           </div>
         </div>
 
-        {/* Mobile Quick Search Bar (when opened via icon) */}
+        {/* Mobile Quick Search Bar (When search icon is clicked) */}
         {!hideSearch && mobileSearchOpen && (
           <div className="md:hidden px-3 py-2.5 bg-slate-50 border-t border-slate-200 animate-in slide-in-from-top-1">
             <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:border-teal-400 shadow-sm">
@@ -196,37 +199,9 @@ export default function Navbar({
           </div>
         )}
 
-        {/* Mobile Drawer Menu */}
+        {/* Mobile Drawer Menu (Cleaned Up) */}
         {mobileMenuOpen && (
           <div className="lg:hidden px-3 pt-3 pb-5 bg-white/98 backdrop-blur-md border-b border-slate-200 space-y-2 shadow-xl animate-in slide-in-from-top-2">
-            {!hideSearch && (
-              <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 focus-within:border-teal-400 focus-within:bg-white mb-3">
-                <Search className="h-4 w-4 shrink-0 text-slate-400" />
-                <input
-                  type="search"
-                  value={searchQuery || ''}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search medicines or formula..."
-                  aria-label="Search all products"
-                  className="w-full bg-transparent text-xs font-semibold text-slate-700 outline-none placeholder:text-slate-400"
-                />
-              </label>
-            )}
-
-            {showBackToHome && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  window.location.href = import.meta.env.BASE_URL || '/';
-                }}
-                className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-teal-800 flex items-center gap-3 bg-teal-50"
-              >
-                <ArrowLeft className="w-4 h-4 text-teal-600" />
-                Back to Home
-              </button>
-            )}
-
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

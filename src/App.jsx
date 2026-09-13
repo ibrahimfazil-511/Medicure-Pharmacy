@@ -715,45 +715,40 @@ function StoreFront({
       </main>
 
       {/* FULLY RESPONSIVE BANNERS SECTION (NO CROP) */}
-      <section className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-4 sm:mb-6">
-          Special Offers & Discounts
-        </h2>
+    <section className="max-w-5xl mx-auto w-full px-3 sm:px-6 py-3 sm:py-5">
+  <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+    {/* Banner 1 */}
+    <div className="w-full bg-slate-100 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <img
+        src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSMall%2520Banner%2520Sunscreen.jpeg&w=1400&q=75"
+        alt="Sunscreen and personal care promotion"
+        className="w-full max-h-36 sm:max-h-48 object-cover block hover:scale-[1.01] transition-transform duration-300"
+        loading="lazy"
+      />
+    </div>
 
-        <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          {/* Banner 1 */}
-          <div className="w-full bg-slate-100 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <img
-              src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSMall%2520Banner%2520Sunscreen.jpeg&w=1400&q=75"
-              alt="Sunscreen and personal care promotion"
-              className="w-full h-auto object-contain block hover:scale-[1.01] transition-transform duration-300"
-              loading="lazy"
-            />
-          </div>
-
-          {/* Banner 2 */}
-          <div className="w-full bg-slate-100 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <img
-              src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSmall%2520Banner%2520Multivitamins%2520.jpeg&w=1400&q=75"
-              alt="Over the counter medicines promotion"
-              className="w-full h-auto object-contain block hover:scale-[1.01] transition-transform duration-300"
-              loading="lazy"
-            />
-          </div>
-        </div>
-      </section>
+    {/* Banner 2 */}
+    <div className="w-full bg-slate-100 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <img
+        src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSmall%2520Banner%2520Multivitamins%2520.jpeg&w=1400&q=75"
+        alt="Over the counter medicines promotion"
+        className="w-full max-h-36 sm:max-h-48 object-cover block hover:scale-[1.01] transition-transform duration-300"
+        loading="lazy"
+      />
+    </div>
+  </div>
+</section>
 
       {/* ORIGINAL POSITION HOMEPAGE-ONLY WHATSAPP WIDGET */}
-      <div className="fixed right-2 sm:right-6 top-1/2 -translate-y-1/2 z-50 flex items-center select-none">
+      <div className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-50 flex items-center select-none">
         <span className="absolute -inset-1 rounded-full bg-emerald-500/20 animate-ping opacity-75 pointer-events-none" />
 
         <a
-          href="https://wa.me/923000000000"
+          href="https://wa.me/923342850819"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contact Pharmacy on WhatsApp"
-          className="relative group flex items-center gap-1.5 sm:gap-2.5 bg-white/95 hover:bg-emerald-50/95 backdrop-blur-md border border-emerald-200/80 hover:border-emerald-400/90 text-emerald-950 px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-full shadow-[0_8px_20px_-4px_rgba(16,185,129,0.25)] sm:shadow-[0_10px_25px_-5px_rgba(16,185,129,0.25)] hover:shadow-[0_15px_30px_-5px_rgba(16,185,129,0.35)] transition-all duration-300 ease-out hover:-translate-x-1"
-        >
+          className="relative group flex items-center gap-1.5 sm:gap-2.5 bg-white/95 hover:bg-emerald-50/95 backdrop-blur-md border border-emerald-200/80 hover:border-emerald-400/90 text-emerald-950 px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-full shadow-[0_8px_20px_-4px_rgba(16,185,129,0.25)] sm:shadow-[0_10px_25px_-5px_rgba(16,185,129,0.25)] hover:shadow-[0_15px_30px_-5px_rgba(16,185,129,0.35)] transition-all duration-300 ease-out hover:-translate-x-1" >
           <div className="relative flex items-center justify-center shrink-0">
             <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform duration-300">
               <svg
@@ -770,14 +765,14 @@ function StoreFront({
             </span>
           </div>
 
-          <div className="flex flex-col text-left pr-0.5 sm:pr-1">
+          {/* <div className="flex flex-col text-left pr-0.5 sm:pr-1">
             <span className="text-[10px] sm:text-sm font-black text-emerald-900 group-hover:text-emerald-700 transition-colors leading-none sm:leading-tight">
               WhatsApp
             </span>
             <span className="hidden sm:inline-block text-[10px] font-semibold text-emerald-600/90 leading-none mt-0.5">
               Help Desk
             </span>
-          </div>
+          </div> */}
         </a>
       </div>
 

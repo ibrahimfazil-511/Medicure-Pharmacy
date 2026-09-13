@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ShoppingBag, Trash2, Plus, Minus, AlertTriangle, ShieldCheck, ArrowRight, CheckCircle2, Truck } from 'lucide-react';
+import { X, ShoppingBag, Trash2, Plus, Minus, AlertTriangle, ArrowRight, CheckCircle2, Truck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { saveOrder, sendOrderEmail } from '../services/supabaseClient.js';
 
@@ -20,7 +20,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.medicine.price * item.quantity), 0);
   
-  // Delivery Fee Logic: Karachi orders < 5000 have Rs 150 fee, >= 5000 are FREE. Out of city has no delivery fee mentioned.
+  // Delivery Fee Logic: Karachi orders < 5000 have Rs 150 fee, >= 5000 are FREE.
   let shippingFee = 0;
   if (city === 'Karachi') {
     shippingFee = subtotal >= 5000 ? 0 : 150;
@@ -57,17 +57,14 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
       createdAt: new Date().toLocaleString()
     };
 
-    console.log('[CartDrawer] Submitting order payload:', orderObj);
     const result = await saveOrder(orderObj);
     setPlacing(false);
 
     if (!result.success) {
-      console.error('[CartDrawer] Order submission failed:', result.error);
       setOrderError(typeof result.error === 'string' ? result.error : 'Database error saving order.');
       return;
     }
 
-    console.log('[CartDrawer] Order placed and saved in Supabase:', result);
     const finalizedOrder = {
       ...orderObj,
       id: result.id,
@@ -211,7 +208,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
 
               </div>
             ) : (
-              /* Checkout View - Wrapped in form to trigger HTML5 validation */
+              /* Checkout View */
               <form onSubmit={handlePlaceOrder} className="flex-1 overflow-y-auto py-3 sm:py-4 space-y-4 flex flex-col justify-between no-scrollbar">
                 <div className="space-y-3.5 sm:space-y-4">
                   <h3 className="text-sm font-extrabold text-slate-800">Delivery & Checkout Information</h3>
@@ -239,9 +236,10 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Email Address <span className="text-slate-400 font-normal">(Optional for updates)</span></label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Email Address <span className="text-rose-500">*</span></label>
                     <input 
                       type="email" 
+                      required
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       placeholder="e.g. ibrahim@example.com"
@@ -250,11 +248,12 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number (For Rider) <span className="text-slate-400 font-normal">(Optional if email is provided)</span></label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number (For Rider) <span className="text-rose-500">*</span></label>
                     <div className="flex items-center rounded-xl soft-inset-sm bg-white focus-within:ring-2 focus-within:ring-teal-500">
                       <span className="px-3 text-xs sm:text-sm font-bold text-slate-600 shrink-0">+92</span>
                       <input
                         type="tel"
+                        required
                         inputMode="numeric"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
@@ -296,7 +295,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                     </select>
                   </div>
 
-                  {/* Payment Method — Only Cash on Delivery */}
+                  {/* Payment Method */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">Payment Method</label>
                     <div className="p-3 rounded-xl soft-inset-sm bg-teal-50 border border-teal-200 text-xs font-bold text-teal-800 flex items-center gap-2">

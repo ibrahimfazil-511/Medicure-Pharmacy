@@ -55,7 +55,11 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
             )}
           </div>
         </div>
-
+         <div className="mt-1.5 flex items-center gap-1.5">
+          <p className="text-100px text-slate-900 font-semibold text-100px line-clamp-2">
+            {medicine.formula || 'Pharmacy product'}
+          </p>
+        </div>
         {/* Price and Add to Cart Action */}
         <div className="mt-2 pt-2 border-t border-slate-200/70 flex items-center justify-between gap-1.5">
           <div className="min-w-0 flex-1">

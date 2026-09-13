@@ -9,8 +9,6 @@ import {
   submitReview,
 } from '../services/supabaseClient';
 
-
-
 export default function MedicineDetailModal({
   medicine,
   onClose,
@@ -76,13 +74,11 @@ export default function MedicineDetailModal({
   const companyName =
     medicine.company || medicine.manufacturer || medicine.brand || medicine.supplier || null;
 
-  // Close modal, then run target action (used for all navbar buttons inside modal)
   const runAfterClose = (callback) => () => {
     onClose?.();
     setTimeout(() => callback?.(), 100);
   };
 
-  // Add to Cart → close modal → open cart drawer
   const handleAdd = () => {
     onAddToCart(medicine, quantity);
     setAdded(true);
@@ -148,7 +144,7 @@ export default function MedicineDetailModal({
   return (
     <div className="fixed inset-0 z-[9999] bg-[#f4f8f8] overflow-y-auto animate-in fade-in duration-200">
 
-      {/* ============ NAVBAR (all buttons wired) ============ */}
+      {/* ============ NAVBAR ============ */}
       <Navbar
         onOpenPrescription={runAfterClose(onOpenPrescription)}
         onOpenTrackOrder={runAfterClose(onOpenTrackOrder)}
@@ -158,7 +154,7 @@ export default function MedicineDetailModal({
         onCategoryClick={onCategoryClick}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        showBackToHome={false}
+        showBackToHome={true}  
         hideSearch={true}
         onBack={handleBack}
       />
@@ -168,7 +164,7 @@ export default function MedicineDetailModal({
         className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-1"
         onClick={handleCategoryWrapperClick}
       >
-        <CategoryNavSection /> 
+        <CategoryNavSection />
       </div>
 
       {/* ============ MAIN CONTENT ============ */}
