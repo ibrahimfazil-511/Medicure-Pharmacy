@@ -501,7 +501,6 @@
 
 
 
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
@@ -521,16 +520,8 @@ import OrderConfirmation from './components/OrderConfirmation.jsx';
 import PromoCarousel from './components/PromoCarousel.jsx';
 import LegalModal from './components/LegalModal.jsx';
 
-import { CATEGORIES } from './data/initialMedicines.js';
 import { fetchMedicines } from './services/supabaseClient.js';
-import {
-  Pill,
-  ShieldCheck,
-  Truck,
-  FileText,
-  Search,
-  Sparkles
-} from 'lucide-react';
+import { Flame, ArrowRight } from 'lucide-react';
 
 // Main Storefront Component (Homepage Only Content)
 function StoreFront({
@@ -576,7 +567,7 @@ function StoreFront({
     setVisibleLimit(4);
   }, [searchQuery, selectedCategory]);
 
-  // Foolproof filtering for category and search query
+  // General Filter for main section
   const filteredMedicines = useMemo(() => {
     return medicines.filter((item) => {
       const itemCat = (item.category || '').toLowerCase().trim();
@@ -616,6 +607,27 @@ function StoreFront({
     });
   }, [medicines, searchQuery, selectedCategory]);
 
+  // Filter specifically for "Pain Relief" Sub-Category Section
+  const painReliefMedicines = useMemo(() => {
+    return medicines.filter((item) => {
+      const cat = (item.category || '').toLowerCase();
+      const subCat = (item.subCategory || '').toLowerCase();
+      const name = (item.name || '').toLowerCase();
+      const formula = (item.formula || '').toLowerCase();
+
+      return (
+        cat.includes('pain') ||
+        subCat.includes('pain') ||
+        name.includes('panadol') ||
+        name.includes('brufen') ||
+        name.includes('disprin') ||
+        name.includes('ponstan') ||
+        formula.includes('paracetamol') ||
+        formula.includes('ibuprofen')
+      );
+    });
+  }, [medicines]);
+
   const visibleMedicines = filteredMedicines.slice(0, visibleLimit);
   const nextVisibleLimit = visibleLimit === 4 ? 20 : filteredMedicines.length;
 
@@ -639,17 +651,20 @@ function StoreFront({
         setSearchQuery={setSearchQuery}
       />
 
-      <main className="flex-1">
+      <main className="flex-1 w-full space-y-6 sm:space-y-8">
 
-        <PromoCarousel
-          onOrderNow={() => {
-            const categorySection = document.getElementById('shop-categories');
-            categorySection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        />
+        {/* Promo Carousel Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4">
+          <PromoCarousel
+            onOrderNow={() => {
+              const categorySection = document.getElementById('shop-categories');
+              categorySection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          />
+        </section>
 
         {/* Category Navigation Section */}
-        <section id="shop-categories" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4">
+        <section id="shop-categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <CategoryNavSection
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
@@ -657,7 +672,7 @@ function StoreFront({
         </section>
 
         {/* All Products & Medicines Grid Section */}
-        <section id="products-grid" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 clinic-hero">
+        <section id="products-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 clinic-hero">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4 sm:mb-6">
             <h2 className="text-lg sm:text-2xl font-black text-slate-900">
               All Products & Medicines
@@ -710,36 +725,78 @@ function StoreFront({
           )}
         </section>
 
-        <BrandShowcase />
+        {/* PAIN RELIEF SUB-CATEGORY SECTION */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-red-50/50 via-rose-50/30 to-amber-50/40 rounded-3xl border border-red-100 shadow-sm">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-red-500 text-white shadow-md">
+                  <Flame className="w-5 h-5 sm:w-6 sm:h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-2xl font-black text-slate-900">Pain Relief</h3>
+                  <p className="text-xs text-slate-500 font-medium">Fast relief tablets, sprays & painkillers</p>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setSelectedCategory('Pain Relief')}
+                className="flex items-center gap-1 text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-700 hover:underline"
+              >
+                See All <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {painReliefMedicines.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+                {painReliefMedicines.slice(0, 4).map((medicine) => (
+                  <MedicineCard
+                    key={medicine.id}
+                    medicine={medicine}
+                    onQuickView={(med) => setSelectedMedicine(med)}
+                    onAddToCart={(med) => onAddToCart(med)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="p-6 text-center text-slate-500 bg-white/60 rounded-2xl border border-dashed border-red-200">
+                No Pain Relief products available right now.
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Brand Showcase Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <BrandShowcase />
+        </section>
+
+        {/* FULLY RESPONSIVE BANNERS SECTION */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+          <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="w-full bg-slate-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <img
+                src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSMall%2520Banner%2520Sunscreen.jpeg&w=1400&q=75"
+                alt="Sunscreen and personal care promotion"
+                className="w-full max-h-36 sm:max-h-48 object-cover block hover:scale-[1.01] transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="w-full bg-slate-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <img
+                src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSmall%2520Banner%2520Multivitamins%2520.jpeg&w=1400&q=75"
+                alt="Over the counter medicines promotion"
+                className="w-full max-h-36 sm:max-h-48 object-cover block hover:scale-[1.01] transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </section>
 
       </main>
 
-      {/* FULLY RESPONSIVE BANNERS SECTION (NO CROP) */}
-    <section className="max-w-5xl mx-auto w-full px-3 sm:px-6 py-3 sm:py-5">
-  <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-    {/* Banner 1 */}
-    <div className="w-full bg-slate-100 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <img
-        src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSMall%2520Banner%2520Sunscreen.jpeg&w=1400&q=75"
-        alt="Sunscreen and personal care promotion"
-        className="w-full max-h-36 sm:max-h-48 object-cover block hover:scale-[1.01] transition-transform duration-300"
-        loading="lazy"
-      />
-    </div>
-
-    {/* Banner 2 */}
-    <div className="w-full bg-slate-100 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <img
-        src="https://www.dvago.pk/_next/image?url=https%3A%2F%2Fdvago-assets.s3.ap-southeast-1.amazonaws.com%2FBanners%2FSmall%2520Banner%2520Multivitamins%2520.jpeg&w=1400&q=75"
-        alt="Over the counter medicines promotion"
-        className="w-full max-h-36 sm:max-h-48 object-cover block hover:scale-[1.01] transition-transform duration-300"
-        loading="lazy"
-      />
-    </div>
-  </div>
-</section>
-
-      {/* ORIGINAL POSITION HOMEPAGE-ONLY WHATSAPP WIDGET */}
+      {/* WHATSAPP WIDGET */}
       <div className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-50 flex items-center select-none">
         <span className="absolute -inset-1 rounded-full bg-emerald-500/20 animate-ping opacity-75 pointer-events-none" />
 
@@ -748,7 +805,8 @@ function StoreFront({
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contact Pharmacy on WhatsApp"
-          className="relative group flex items-center gap-1.5 sm:gap-2.5 bg-white/95 hover:bg-emerald-50/95 backdrop-blur-md border border-emerald-200/80 hover:border-emerald-400/90 text-emerald-950 px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-full shadow-[0_8px_20px_-4px_rgba(16,185,129,0.25)] sm:shadow-[0_10px_25px_-5px_rgba(16,185,129,0.25)] hover:shadow-[0_15px_30px_-5px_rgba(16,185,129,0.35)] transition-all duration-300 ease-out hover:-translate-x-1" >
+          className="relative group flex items-center gap-1.5 sm:gap-2.5 bg-white/95 hover:bg-emerald-50/95 backdrop-blur-md border border-emerald-200/80 hover:border-emerald-400/90 text-emerald-950 px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-full shadow-[0_8px_20px_-4px_rgba(16,185,129,0.25)] sm:shadow-[0_10px_25px_-5px_rgba(16,185,129,0.25)] hover:shadow-[0_15px_30px_-5px_rgba(16,185,129,0.35)] transition-all duration-300 ease-out hover:-translate-x-1"
+        >
           <div className="relative flex items-center justify-center shrink-0">
             <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform duration-300">
               <svg
@@ -764,28 +822,13 @@ function StoreFront({
               <span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-emerald-500 border border-white sm:border-2"></span>
             </span>
           </div>
-
-          {/* <div className="flex flex-col text-left pr-0.5 sm:pr-1">
-            <span className="text-[10px] sm:text-sm font-black text-emerald-900 group-hover:text-emerald-700 transition-colors leading-none sm:leading-tight">
-              WhatsApp
-            </span>
-            <span className="hidden sm:inline-block text-[10px] font-semibold text-emerald-600/90 leading-none mt-0.5">
-              Help Desk
-            </span>
-          </div> */}
         </a>
       </div>
 
-      {/* ===================================================== */}
-      {/* Modals & Drawers                                      */}
-      {/* ===================================================== */}
-
-      {/* MedicineDetailModal — navbar handlers wired so all buttons work */}
       <MedicineDetailModal
         medicine={selectedMedicine}
         onClose={() => setSelectedMedicine(null)}
         onAddToCart={(med, qty) => onAddToCart(med, qty)}
-        // Navbar handlers inside the modal
         onOpenPrescription={onOpenPrescription}
         onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
         onOpenContactUs={() => setIsContactUsOpen(true)}
@@ -806,14 +849,14 @@ function StoreFront({
         onClose={() => setIsContactUsOpen(false)}
       />
 
-    <Footer
-  onOpenPrescription={onOpenPrescription}
-  onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
-  onOpenContactUs={() => setIsContactUsOpen(true)}
-  onOpenAdminPortal={onOpenAdminPortal}
-  onOpenLegal={setLegalModal}
-  onCategoryClick={(cat) => setSelectedCategory(cat)}
-/>
+      <Footer
+        onOpenPrescription={onOpenPrescription}
+        onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
+        onOpenContactUs={() => setIsContactUsOpen(true)}
+        onOpenAdminPortal={onOpenAdminPortal}
+        onOpenLegal={setLegalModal}
+        onCategoryClick={(cat) => setSelectedCategory(cat)}
+      />
       <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />
 
     </div>
@@ -828,7 +871,6 @@ export default function App() {
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [completedOrder, setCompletedOrder] = useState(null);
 
-  // Track order & Contact modals (hoisted so category page & modal can use them)
   const [isTrackOrderOpen, setIsTrackOrderOpen] = useState(false);
   const [isContactUsOpen, setIsContactUsOpen] = useState(false);
 
@@ -915,7 +957,6 @@ export default function App() {
         />
       </Routes>
 
-      {/* Global Cart Drawer */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
