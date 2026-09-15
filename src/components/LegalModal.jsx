@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, ShieldCheck, X } from 'lucide-react';
+import { FileText, ShieldCheck, X , Info } from 'lucide-react';
 
 const policyContent = {
   privacy: {
@@ -22,6 +22,17 @@ const policyContent = {
       ['Prescription medicines', 'Prescription medicines are supplied only after the required prescription has been reviewed and approved by our pharmacy team.'],
       ['Cash on delivery', 'Our current payment method is Cash on Delivery. Payment is collected when the order is delivered, unless we communicate another arrangement.'],
       ['Delivery and support', 'Delivery times are estimates and can change because of location, traffic, weather, or product verification. Please contact us if there is a problem with your order.']
+    ]
+  },
+  about: {
+    title: 'About Us',
+    icon: Info, // ya UserCheck / HeartHandshake / Info icon import kar lein
+    sections: [
+      ['Who we are', 'MediCure Pharmacy is your trusted online partner for genuine medicines, health products, and daily wellness needs.'],
+      ['Our mission', 'We aim to make healthcare simple and affordable by delivering original medicines directly to your doorstep with care.'],
+      ['Quality guaranteed', 'All our products come from verified suppliers, and prescription medicines are checked by qualified pharmacy staff before delivery.'],
+      ['Fast & safe delivery', 'We pack your orders safely and deliver them quickly with temperature-controlled handling for sensitive medicines.'],
+      ['Customer care', 'Our support team is always here to help you with product details, order updates, and healthcare guidance whenever you need it.']
     ]
   }
 };

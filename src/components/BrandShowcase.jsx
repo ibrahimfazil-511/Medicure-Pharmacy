@@ -60,10 +60,8 @@
 
 
 
-
-import React, { useRef } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const brands = [
   { name: 'AGP', domain: 'agp.com.pk', aliases: ['agp'] },
@@ -77,22 +75,30 @@ const brands = [
 
 export default function BrandShowcase() {
   const navigate = useNavigate();
-  const scrollContainerRef = useRef(null);
 
-  const handleScroll = (direction) => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -220 : 220;
-      scrollContainerRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
+  // Infinite loop ke liye array duplicate
+  const duplicatedBrands = [...brands, ...brands];
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-3 sm:py-4" aria-labelledby="trusted-brands-heading">
       
-      {/* HEADER SECTION ALIGNMENT FIX */}
+      {/* Inline Stylesheet for Seamless Keyframes */}
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee-track {
+          display: flex;
+          width: max-content;
+          animation: marquee 20s linear infinite;
+        }
+        .animate-marquee-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      {/* HEADER SECTION */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-teal-700 leading-tight">
@@ -103,59 +109,46 @@ export default function BrandShowcase() {
           </h2>
         </div>
 
-        {/* CONTROLS ALIGNMENT */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <span className="hidden min-[380px]:inline-block text-[11px] sm:text-xs font-bold text-slate-500 mr-1">
+          <span className="inline-block text-[11px] sm:text-xs font-bold text-slate-500 mr-1">
             {brands.length} brands
           </span>
-          <button
-            type="button"
-            onClick={() => handleScroll('left')}
-            className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-teal-500 hover:text-white hover:border-teal-500 active:scale-95"
-            aria-label="Scroll Left"
-          >
-            <ChevronLeft className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => handleScroll('right')}
-            className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-teal-500 hover:text-white hover:border-teal-500 active:scale-95"
-            aria-label="Scroll Right"
-          >
-            <ChevronRight className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-          </button>
         </div>
       </div>
 
-      {/* HORIZONTAL CAROUSEL CONTAINER */}
-      <div
-        ref={scrollContainerRef}
-        className="flex items-center gap-2.5 sm:gap-3 overflow-x-auto scroll-smooth py-1 no-scrollbar"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        {brands.map((brand) => (
-          <button
-            key={brand.name}
-            type="button"
-            onClick={() => navigate(`/category/medicines?brand=${encodeURIComponent(brand.name)}`)}
-            className="group flex h-24 sm:h-32 w-28 sm:w-44 flex-none flex-col items-center justify-between rounded-xl border border-slate-200 bg-white p-2 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:border-teal-400 hover:shadow-lg active:scale-95 cursor-pointer"
-          >
-            <div className="flex h-12 sm:h-16 w-full items-center justify-center rounded-lg bg-white p-1">
-              <img
-                src={`https://cdn.brandfetch.io/domain/${brand.domain}/w/400/h/160/logo`}
-                alt={`${brand.name} logo`}
-                className="max-h-full max-w-full object-contain transition-transform duration-200 group-hover:scale-105"
-                loading="lazy"
-                onError={(event) => {
-                  event.currentTarget.style.display = 'none';
-                }}
-              />
-            </div>
-            <span className="text-center text-[11px] sm:text-xs font-bold text-slate-700 truncate w-full">
-              {brand.name}
-            </span>
-          </button>
-        ))}
+      {/* INFINITE MARQUEE CAROUSEL CONTAINER */}
+      <div className="relative w-full overflow-hidden flex items-center py-2">
+        
+        {/* Soft Fade Edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+        {/* Continuous Animated Track */}
+        <div className="animate-marquee-track space-x-3 sm:space-x-4 items-center">
+          {duplicatedBrands.map((brand, index) => (
+            <button
+              key={`${brand.name}-${index}`}
+              type="button"
+              onClick={() => navigate(`/category/medicines?brand=${encodeURIComponent(brand.name)}`)}
+              className="group flex h-24 sm:h-32 w-28 sm:w-44 flex-none flex-col items-center justify-between rounded-xl border border-slate-200 bg-white p-2 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:border-teal-400 hover:shadow-lg active:scale-95 cursor-pointer"
+            >
+              <div className="flex h-12 sm:h-16 w-full items-center justify-center rounded-lg bg-white p-1">
+                <img
+                  src={`https://cdn.brandfetch.io/domain/${brand.domain}/w/400/h/160/logo`}
+                  alt={`${brand.name} logo`}
+                  className="max-h-full max-w-full object-contain transition-transform duration-200 group-hover:scale-105"
+                  loading="lazy"
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+              <span className="text-center text-[11px] sm:text-xs font-bold text-slate-700 truncate w-full">
+                {brand.name}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );

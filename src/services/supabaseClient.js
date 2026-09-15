@@ -521,3 +521,34 @@ CREATE POLICY "Public can insert reviews"
   ON reviews FOR INSERT WITH CHECK (true);
 `;
 }
+
+
+// Fetch medicines by category with local dataset fallback
+export async function fetchMedicinesByCategory(categoryName) {
+  if (!categoryName) return [];
+
+  const targetCategory = categoryName.toLowerCase().trim();
+
+  try {
+    const client = getSupabase();
+    const { data, error } = await client
+      .from('medicines')
+      .select('*')
+      .ilike('category', `%${targetCategory}%`);
+
+    if (error || !data || data.length === 0) {
+      // Local dataset fallback agar Supabase offline ya empty ho
+      return INITIAL_MEDICINES.map(mapMedicineRow).filter(item =>
+        item.category.includes(targetCategory)
+      );
+    }
+
+    return data.map(mapMedicineRow);
+  } catch (err) {
+    console.warn('Error fetching medicines by category:', err);
+    // Error case me bhi local data fallback return karein
+    return INITIAL_MEDICINES.map(mapMedicineRow).filter(item =>
+      item.category.includes(targetCategory)
+    );
+  }
+}
