@@ -178,8 +178,9 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
                       <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                         <div className="flex items-center rounded-lg soft-inset p-0.5">
                           <button
-                            onClick={() => onUpdateQuantity(item.medicine.id, item.quantity - 1)}
-                            className="w-6 h-6 rounded font-bold text-slate-700 flex items-center justify-center text-xs active:bg-slate-200"
+                            onClick={() => onUpdateQuantity(item.medicine.id, Math.max(1, item.quantity - 1))}
+                            disabled={item.quantity <= 1}
+                            className="w-6 h-6 rounded font-bold text-slate-700 flex items-center justify-center text-xs active:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed"
                             aria-label="Decrease quantity"
                           >
                             <Minus className="w-3 h-3" />
