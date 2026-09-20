@@ -405,34 +405,23 @@
 //     </div>
 //   );
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from 'react';
-import { Pill, AlertTriangle, ShieldCheck, ShoppingBag, Check, Star, MessageSquarePlus, Loader2, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Pill, AlertTriangle, ShieldCheck, ShoppingBag, Check, Star, MessageSquarePlus, Loader2 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from './Navbar';
 import CategoryNavSection from './CategoryNavSection';
-import Footer from './Footer'; // Make sure Footer path is correct
+import Footer from './Footer';
+import MedicineCard from './MedicineCard';
 import {
   fetchMedicineRating,
   fetchMedicineReviews,
   submitReview,
-  fetchMedicinesByCategory, // Supabase query function
+  fetchMedicinesByCategory,
+  fetchMedicineByIdOrSlug,
 } from '../services/supabaseClient';
 
 export default function MedicineDetailModal({
-  medicine,
+  medicine: propMedicine,
   onClose,
   onAddToCart,
   onOpenPrescription,
@@ -443,9 +432,36 @@ export default function MedicineDetailModal({
   searchQuery = '',
   setSearchQuery = () => {},
   onCategoryClick,
-  onSelectMedicine, // Current medicine update karne ke liye callback
+  onSelectMedicine,
 }) {
   const navigate = useNavigate();
+  const { productId } = useParams();
+
+  const [medicine, setMedicine] = useState(propMedicine || null);
+  const [fetchingMed, setFetchingMed] = useState(!propMedicine && !!productId);
+
+  // Sync prop medicine if updated by parent
+  useEffect(() => {
+    if (propMedicine) {
+      setMedicine(propMedicine);
+    }
+  }, [propMedicine]);
+
+  // Dynamically load medicine if rendered via URL param /product/:productId
+  useEffect(() => {
+    if (productId) {
+      let cancelled = false;
+      (async () => {
+        setFetchingMed(true);
+        const res = await fetchMedicineByIdOrSlug(productId);
+        if (!cancelled) {
+          if (res.data) setMedicine(res.data);
+          setFetchingMed(false);
+        }
+      })();
+      return () => { cancelled = true; };
+    }
+  }, [productId]);
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -467,12 +483,31 @@ export default function MedicineDetailModal({
 
   const medicineId = medicine?.id;
 
+  // Handle body overflow, instant scroll reset to top, and state reset on medicine change
   useEffect(() => {
     if (!medicine) return;
+    
     const original = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+
+    // Instant top scroll reset for modal container & window
+    const modalContainer = document.getElementById('medicine-detail-modal-container');
+    if (modalContainer) {
+      modalContainer.scrollTop = 0;
+    }
+    window.scrollTo(0, 0);
+
+    // Reset local component states
+    setQuantity(1);
+    setAdded(false);
+    setUserRating(0);
+    setHoverRating(0);
+    setReviewName('');
+    setReviewText('');
+    setSubmitMsg(null);
+
     return () => { document.body.style.overflow = original; };
-  }, [medicine]);
+  }, [medicineId]);
 
   // Fetch rating & reviews
   useEffect(() => {
@@ -492,7 +527,7 @@ export default function MedicineDetailModal({
     return () => { cancelled = true; };
   }, [medicineId]);
 
-  // Fetch 8 related products from same category/subcategory
+  // Fetch 8 related products from same category
   useEffect(() => {
     if (!medicine?.category) return;
     let cancelled = false;
@@ -501,7 +536,6 @@ export default function MedicineDetailModal({
       try {
         const list = await fetchMedicinesByCategory(medicine.category);
         if (cancelled) return;
-        // Filter out current medicine and select up to 8 items
         const filtered = (list || [])
           .filter((item) => item.id !== medicine.id)
           .slice(0, 8);
@@ -515,7 +549,30 @@ export default function MedicineDetailModal({
     return () => { cancelled = true; };
   }, [medicine?.id, medicine?.category]);
 
-  if (!medicine) return null;
+  if (!medicine && fetchingMed) {
+    return (
+      <div className="min-h-screen bg-[#f4f8f8] flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-10 h-10 text-teal-600 animate-spin" />
+        <p className="text-sm font-bold text-slate-700">Loading product details...</p>
+      </div>
+    );
+  }
+
+  if (!medicine) {
+    return (
+      <div className="min-h-screen bg-[#f4f8f8] flex flex-col items-center justify-center space-y-4 p-6 text-center">
+        <Pill className="w-12 h-12 text-slate-400" />
+        <h2 className="text-xl font-bold text-slate-800">Product not found</h2>
+        <p className="text-sm text-slate-500 max-w-sm">The medicine you are looking for is unavailable or may have been removed.</p>
+        <button
+          onClick={() => navigate('/')}
+          className="px-4 py-2 bg-teal-600 text-white font-bold text-xs rounded-xl shadow hover:bg-teal-700 transition cursor-pointer"
+        >
+          Return to Store
+        </button>
+      </div>
+    );
+  }
 
   const categoryStr = (medicine.category || '').toLowerCase();
   const isMedicine =
@@ -530,19 +587,41 @@ export default function MedicineDetailModal({
     setTimeout(() => callback?.(), 100);
   };
 
+  // Main detail add to cart handler
   const handleAdd = () => {
-    onAddToCart(medicine, quantity);
+    onAddToCart?.(medicine, quantity);
     setAdded(true);
     setTimeout(() => {
       setAdded(false);
       onClose?.();
       setTimeout(() => onOpenCart?.(), 100);
-    }, 500);
+    }, 400);
+  };
+
+  // Related products direct cart action handler
+  const handleRelatedAddToCart = (item) => {
+    onAddToCart?.(item, 1);
+    onClose?.();
+    setTimeout(() => onOpenCart?.(), 100);
+  };
+
+  // Related products quick view / card click handler
+  const handleRelatedSelect = (item) => {
+    if (onSelectMedicine) {
+      onSelectMedicine(item);
+    }
+    navigate(`/product/${item.id || encodeURIComponent(item.name)}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBack = () => {
-    if (onClose) onClose();
-    else navigate(-1);
+    if (onClose) {
+      onClose();
+    } else if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
   };
 
   const handleCategoryWrapperClick = (e) => {
@@ -592,8 +671,16 @@ export default function MedicineDetailModal({
   const displayRating = liveRating.avg_rating > 0 ? liveRating.avg_rating.toFixed(1) : null;
   const reviewCount = liveRating.review_count || 0;
 
+  const isModal = Boolean(onClose);
+  const containerClass = isModal
+    ? "fixed inset-0 z-[9999] bg-[#f4f8f8] overflow-y-auto animate-in fade-in duration-200"
+    : "min-h-screen bg-[#f4f8f8] flex flex-col animate-in fade-in duration-200";
+
   return (
-    <div className="fixed inset-0 z-[9999] bg-[#f4f8f8] overflow-y-auto animate-in fade-in duration-200">
+    <div
+      id="medicine-detail-modal-container"
+      className={containerClass}
+    >
 
       {/* ============ NAVBAR ============ */}
       <Navbar
@@ -853,7 +940,7 @@ export default function MedicineDetailModal({
           </div>
         </div>
 
-        {/* ============ RELATED PRODUCTS (8 ITEMS GRID) ============ */}
+        {/* ============ RELATED PRODUCTS ============ */}
         <div className="mt-8 space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -871,34 +958,13 @@ export default function MedicineDetailModal({
           ) : relatedProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
               {relatedProducts.map((item) => (
-                <div
+                <MedicineCard
                   key={item.id}
-                  onClick={() => {
-                    if (onSelectMedicine) onSelectMedicine(item);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-3 shadow-sm hover:border-teal-400 hover:shadow-md transition cursor-pointer"
-                >
-                  <div className="relative flex aspect-square w-full items-center justify-center rounded-xl bg-slate-50 p-2 mb-2">
-                    <img
-                      src={item.imageUrl || item.image}
-                      alt={item.name}
-                      className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-bold text-slate-900 line-clamp-2 leading-tight group-hover:text-teal-700 transition">
-                      {item.name}
-                    </h4>
-                    <p className="text-[10px] text-slate-400 truncate">
-                      {item.brand || item.company || item.category}
-                    </p>
-                    <p className="text-xs font-black text-teal-700">
-                      PKR {Number(item.price || 0).toLocaleString('en-PK')}
-                    </p>
-                  </div>
-                </div>
+                  medicine={item}
+                  onAddToCart={handleRelatedAddToCart}
+                  onQuickView={() => handleRelatedSelect(item)}
+                  onClick={() => handleRelatedSelect(item)}
+                />
               ))}
             </div>
           ) : (

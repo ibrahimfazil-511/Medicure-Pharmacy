@@ -182,7 +182,6 @@
 
 
 
-
 import logoImg from '../assets/images/medicure_pharmacy_logo_1786426208570.jpg';
 import React from 'react';
 import { 
@@ -194,21 +193,26 @@ import {
   FaGithub, 
   FaShieldAlt 
 } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export default function Footer({ 
   onOpenAdminPortal, 
   onOpenLegal, 
-  onOpenAboutUs 
+  onNavigate,
+  onOpenPrescription,
+  onOpenTrackOrder,
+  onOpenContactUs
 }) {
+  const navigate = useNavigate();
   return (
     <footer className="bg-[#eaf3f3] text-slate-700 pt-8 sm:pt-16 pb-8 border-t border-[#d9e6e7]">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         
         {/* Top Main Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-12 pb-8 sm:pb-12 border-b border-slate-300 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8 md:gap-10 pb-8 sm:pb-12 border-b border-slate-300 items-start">
           
           {/* Column 1: Brand Info & License Badge */}
-          <div className="flex flex-col gap-3.5 sm:gap-4">
+          <div className="flex flex-col gap-3.5 sm:gap-4 md:col-span-1">
             {/* Logo Header */}
             <div className="flex items-center gap-3">
               <img 
@@ -239,8 +243,55 @@ export default function Footer({
             </div>
           </div>
 
-          {/* Column 2: Quick Navigation */}
-          <div className="md:mx-auto">
+          {/* Column 2: Pharmacy Services */}
+          <div>
+            <h3 className="text-xs font-extrabold tracking-wider text-slate-900 uppercase mb-4">
+              OUR SERVICES
+            </h3>
+            <ul className="space-y-2.5 text-sm font-medium">
+              <li>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    if (onNavigate) onNavigate('categories');
+                    else navigate('/category/all');
+                  }} 
+                  className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold cursor-pointer"
+                >
+                  <span className="text-teal-500">›</span> Shop by Category
+                </button>
+              </li>
+              <li>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    if (onOpenPrescription) onOpenPrescription();
+                    else if (onNavigate) onNavigate('prescription');
+                    else navigate('/prescription');
+                  }} 
+                  className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold cursor-pointer"
+                >
+                  <span className="text-teal-500">›</span> Prescription Upload
+                </button>
+              </li>
+              <li>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    if (onOpenTrackOrder) onOpenTrackOrder();
+                    else if (onNavigate) onNavigate('track-order');
+                    else navigate('/track-order');
+                  }} 
+                  className="text-teal-600 hover:text-teal-700 hover:underline transition-all flex items-center gap-1 font-semibold cursor-pointer"
+                >
+                  <span className="text-teal-500">›</span> Track Order
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Quick Navigation */}
+          <div>
             <h3 className="text-xs font-extrabold tracking-wider text-slate-900 uppercase mb-4">
               QUICK NAVIGATION
             </h3>
@@ -275,7 +326,7 @@ export default function Footer({
             </ul>
           </div>
 
-          {/* Column 3: Connect With Us & Social Grid */}
+          {/* Column 4: Connect With Us & Social Grid */}
           <div>
             <h3 className="text-xs font-extrabold tracking-wider text-slate-900 uppercase mb-2">
               CONNECT WITH US
@@ -368,3 +419,4 @@ export default function Footer({
     </footer>
   );
 }
+

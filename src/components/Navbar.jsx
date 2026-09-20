@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import logoImg from '../assets/images/medicure_pharmacy_logo_1786426208570.jpg';
 import {
   Pill,
@@ -24,10 +25,33 @@ export default function Navbar({
   searchQuery,
   setSearchQuery,
   showBackToHome = false,
-  hideSearch = false
+  hideSearch = false,
+  onBack
 }) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  const handleBackNavigation = () => {
+    if (onBack) {
+      onBack();
+    } else if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
+  const handleCategoryNav = () => {
+    const element = document.getElementById('shop-categories');
+    if (element && location.pathname === '/') {
+      element.scrollIntoView({ behavior: 'smooth' });
+      if (onCategoryClick) onCategoryClick('All');
+    } else {
+      navigate('/category/medicines');
+    }
+  };
 
   return (
     <>
@@ -40,12 +64,10 @@ export default function Navbar({
               {showBackToHome && (
                 <button
                   type="button"
-                  onClick={() => {
-                    window.location.href = import.meta.env.BASE_URL || '/';
-                  }}
-                  aria-label="Back to Home"
-                  title="Back to Home"
-                  className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-100 hover:bg-teal-100 text-slate-700 hover:text-teal-700 transition active:scale-95 shrink-0"
+                  onClick={handleBackNavigation}
+                  aria-label="Back to previous page"
+                  title="Back"
+                  className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-100 hover:bg-teal-100 text-slate-700 hover:text-teal-700 transition active:scale-95 shrink-0 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
@@ -54,10 +76,7 @@ export default function Navbar({
               <div
                 className="flex items-center space-x-2 cursor-pointer min-w-0 shrink-0"
                 onClick={() => {
-                  if (showBackToHome) {
-                    window.location.href = import.meta.env.BASE_URL || '/';
-                    return;
-                  }
+                  navigate('/');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
               >
@@ -83,28 +102,24 @@ export default function Navbar({
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center space-x-1 bg-slate-200/60 p-1 rounded-xl border border-slate-300/40 shadow-inner shrink-0">
               <button
-                onClick={() => {
-                  const element = document.getElementById('shop-categories');
-                  if (element) element.scrollIntoView({ behavior: 'smooth' });
-                  if (onCategoryClick) onCategoryClick('All');
-                }}
-                className="px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-teal-700 rounded-lg transition-all hover:bg-white flex items-center gap-1.5"
+                onClick={handleCategoryNav}
+                className="px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-teal-700 rounded-lg transition-all hover:bg-white flex items-center gap-1.5 cursor-pointer"
               >
                 <Pill className="w-3.5 h-3.5 text-teal-600 shrink-0" />
                 <span>Shop by Category</span>
               </button>
 
               <button
-                onClick={onOpenPrescription}
-                className="px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-teal-700 rounded-lg transition-all hover:bg-white flex items-center gap-1.5"
+                onClick={() => onOpenPrescription ? onOpenPrescription() : navigate('/prescription')}
+                className="px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-teal-700 rounded-lg transition-all hover:bg-white flex items-center gap-1.5 cursor-pointer"
               >
                 <FileText className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>Prescription Upload</span>
               </button>
 
               <button
-                onClick={onOpenTrackOrder}
-                className="px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-teal-700 rounded-lg transition-all hover:bg-white flex items-center gap-1.5"
+                onClick={() => onOpenTrackOrder ? onOpenTrackOrder() : navigate('/track-order')}
+                className="px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-teal-700 rounded-lg transition-all hover:bg-white flex items-center gap-1.5 cursor-pointer"
               >
                 <Truck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                 <span>Track Order</span>
@@ -139,8 +154,8 @@ export default function Navbar({
 
               {/* Contact Us Button */}
               <button
-                onClick={onOpenContactUs}
-                className="hidden md:flex px-3 py-1.5 sm:py-2 text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 rounded-xl items-center gap-1.5 hover:bg-teal-100 transition"
+                onClick={() => onOpenContactUs ? onOpenContactUs() : navigate('/contact')}
+                className="hidden md:flex px-3 py-1.5 sm:py-2 text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 rounded-xl items-center gap-1.5 hover:bg-teal-100 transition cursor-pointer"
               >
                 <PhoneCall className="w-3.5 h-3.5 text-teal-600 shrink-0" />
                 <span>Contact Us</span>
@@ -149,7 +164,7 @@ export default function Navbar({
               {/* Cart Drawer Toggle Button */}
               <button
                 onClick={onOpenCart}
-                className="relative p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-teal-600 shadow-sm transition-all hover:bg-slate-50 active:scale-95"
+                className="relative p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-teal-600 shadow-sm transition-all hover:bg-slate-50 active:scale-95 cursor-pointer"
                 aria-label="Shopping Cart"
               >
                 <ShoppingBag className="w-4 h-4 text-slate-800" />
@@ -164,7 +179,7 @@ export default function Navbar({
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle Menu"
-                className="lg:hidden p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm active:scale-95 transition"
+                className="lg:hidden p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm active:scale-95 transition cursor-pointer"
               >
                 {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </button>
@@ -199,17 +214,15 @@ export default function Navbar({
           </div>
         )}
 
-        {/* Mobile Drawer Menu (Cleaned Up) */}
+        {/* Mobile Drawer Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden px-3 pt-3 pb-5 bg-white/98 backdrop-blur-md border-b border-slate-200 space-y-2 shadow-xl animate-in slide-in-from-top-2">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                const element = document.getElementById('shop-categories');
-                if (element) element.scrollIntoView({ behavior: 'smooth' });
-                if (onCategoryClick) onCategoryClick('All');
+                handleCategoryNav();
               }}
-              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition"
+              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition cursor-pointer"
             >
               <Pill className="w-4 h-4 text-teal-600" />
               <span>Shop by Category</span>
@@ -218,9 +231,10 @@ export default function Navbar({
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenPrescription();
+                if (onOpenPrescription) onOpenPrescription();
+                else navigate('/prescription');
               }}
-              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition"
+              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition cursor-pointer"
             >
               <FileText className="w-4 h-4 text-emerald-600" />
               <span>Prescription Upload</span>
@@ -229,9 +243,10 @@ export default function Navbar({
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenTrackOrder();
+                if (onOpenTrackOrder) onOpenTrackOrder();
+                else navigate('/track-order');
               }}
-              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition"
+              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition cursor-pointer"
             >
               <Truck className="w-4 h-4 text-blue-600" />
               <span>Track Order Status</span>
@@ -240,9 +255,10 @@ export default function Navbar({
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenContactUs();
+                if (onOpenContactUs) onOpenContactUs();
+                else navigate('/contact');
               }}
-              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition"
+              className="w-full text-left px-3.5 py-3 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-3 bg-slate-50 hover:bg-teal-50 hover:text-teal-700 transition cursor-pointer"
             >
               <PhoneCall className="w-4 h-4 text-teal-600" />
               <span>Contact Us & Helpline</span>

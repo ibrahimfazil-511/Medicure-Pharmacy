@@ -140,6 +140,58 @@ export async function fetchMedicineByName(name) {
   }
 }
 
+// Fetch a single medicine by id, name slug, or fallback
+export async function fetchMedicineByIdOrSlug(idOrSlug) {
+  if (!idOrSlug) return { data: null };
+  const term = decodeURIComponent(String(idOrSlug)).trim().toLowerCase();
+
+  // 1. Try local catalog / INITIAL_MEDICINES first for instant match
+  const localMatch = INITIAL_MEDICINES.find((m) => 
+    String(m.id).toLowerCase() === term ||
+    m.name.toLowerCase() === term ||
+    m.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === term
+  );
+
+  try {
+    const client = getSupabase();
+    // Try matching ID
+    const { data: byId } = await client
+      .from('medicines')
+      .select('*')
+      .eq('id', idOrSlug)
+      .maybeSingle();
+
+    if (byId) {
+      return { data: mapMedicineRow(byId), source: 'Supabase Cloud Database' };
+    }
+
+    // Try matching exact or slug name
+    const { data: allMeds } = await client
+      .from('medicines')
+      .select('*');
+
+    if (allMeds && allMeds.length > 0) {
+      const match = allMeds.find((m) =>
+        String(m.id).toLowerCase() === term ||
+        (m.name || '').toLowerCase() === term ||
+        (m.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-') === term
+      );
+      if (match) {
+        return { data: mapMedicineRow(match), source: 'Supabase Cloud Database' };
+      }
+    }
+  } catch (err) {
+    console.warn('fetchMedicineByIdOrSlug Supabase error:', err);
+  }
+
+  if (localMatch) {
+    return { data: localMatch, source: 'Local Catalog' };
+  }
+
+  return { data: null, source: 'Not Found' };
+}
+
+
 // ============================================================
 // LIVE RATINGS — REVIEWS SYSTEM
 // ============================================================

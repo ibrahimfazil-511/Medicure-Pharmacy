@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, MoveHorizontal } from 'lucide-react';
 
 export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
+  const navigate = useNavigate();
   if (!medicine) return null;
 
   const discount = Math.max(0, Number(medicine.discount) || 0);
@@ -15,9 +17,18 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
   // X-Axis Length Property (Length in cm / mm / inches)
   const xLength = medicine.length || medicine.lengthCm || medicine.dimensions?.x || null;
 
+  const handleCardClick = () => {
+    if (onQuickView) {
+      onQuickView(medicine);
+    } else {
+      const target = medicine.id || encodeURIComponent(medicine.name);
+      navigate(`/product/${target}`);
+    }
+  };
+
   return (
     <div
-      onClick={() => onQuickView && onQuickView(medicine)}
+      onClick={handleCardClick}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
     >
       {/* Product Image Area */}
@@ -83,12 +94,12 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
         <div className="mt-2 pt-1.5 border-t border-slate-200/70 flex items-center justify-between gap-1.5">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0">
-              <span className="text-xs sm:text-sm font-black text-emerald-700 whitespace-nowrap">
+              <span className="text-xs sm:text-sm font-black  text-emerald-700 whitespace-nowrap">
                 PKR {price.toLocaleString()}
               </span>
               {hasDiscount && originalPrice > price && (
                 <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 line-through whitespace-nowrap">
-                  PKR {originalPrice.toLocaleString()}
+                             PKR {originalPrice.toLocaleString()}
                 </span>
               )}
             </div>
