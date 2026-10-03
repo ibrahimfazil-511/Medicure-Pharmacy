@@ -196,7 +196,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 export default function Footer({ 
-  onOpenAdminPortal, 
   onOpenLegal, 
   onNavigate,
   onOpenPrescription,
@@ -401,22 +400,12 @@ export default function Footer({
 
         </div>
 
-        {/* Bottom Copyright & Admin Portal Link */}
+        {/* Bottom Copyright */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 text-center sm:text-left">
           <p>© 2026 MediCure Pharmacy Ltd. All Rights Reserved.</p>
-          <div className="flex items-center gap-4 font-medium">
-            <button 
-              type="button" 
-              onClick={onOpenAdminPortal} 
-              className="hover:text-teal-600 transition text-slate-600 font-semibold"
-            >
-              Admin / Staff Portal
-            </button>
-          </div>
         </div>
 
       </div>
     </footer>
   );
 }
-

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, MoveHorizontal } from 'lucide-react';
 
-export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
+export default function MedicineCard({ medicine, onAddToCart, onQuickView, alternatives = [] }) {
   const navigate = useNavigate();
   if (!medicine) return null;
 
@@ -88,6 +88,11 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
           <p className="mt-1 text-[11px] sm:text-xs text-slate-600 line-clamp-1 font-medium">
             {medicine.formula || 'Pharmacy product'}
           </p>
+          {Number(medicine.stock) <= 0 && alternatives.length > 0 && (
+            <p className="mt-1 text-[10px] font-bold text-amber-700">
+              Alternative: {alternatives[0].name}
+            </p>
+          )}
         </div>
 
         {/* Price and Add to Cart Action */}
@@ -110,9 +115,10 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView }) {
             aria-label={`Add ${medicine.name} to cart`}
             onClick={(e) => {
               e.stopPropagation();
-              onAddToCart?.(medicine);
+              if (Number(medicine.stock) > 0) onAddToCart?.(medicine);
             }}
-            className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white shadow-sm hover:bg-teal-700 active:scale-95 transition"
+            disabled={Number(medicine.stock) <= 0}
+            className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white shadow-sm hover:bg-teal-700 active:scale-95 transition disabled:cursor-not-allowed disabled:bg-slate-300"
           >
             <ShoppingCart className="h-3.5 w-3.5" />
           </button>

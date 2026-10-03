@@ -433,7 +433,7 @@ import {
   Truck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { saveOrder, sendOrderEmail } from '../services/supabaseClient.js';
+import { saveOrder, sendOrderEmail, validateCartStock, decrementCartStock } from '../services/supabaseClient.js';
 
 export default function CartDrawer({
   isOpen,
@@ -492,6 +492,13 @@ export default function CartDrawer({
     setPlacing(true);
     setOrderError(null);
 
+    const stockCheck = await validateCartStock(cartItems);
+    if (!stockCheck.success) {
+      setPlacing(false);
+      setOrderError(stockCheck.error);
+      return;
+    }
+
     const trackingId = `MED-${Math.floor(
       10000 + Math.random() * 90000
     )}`;
@@ -509,6 +516,7 @@ export default function CartDrawer({
       shippingFee: shippingFee !== null ? shippingFee : 0,
       total,
       paymentMethod: 'Cash on Delivery',
+      prescriptionId: localStorage.getItem('medicure_last_prescription_id'),
       trackingId,
       createdAt: new Date().toLocaleString()
     };
@@ -526,10 +534,25 @@ export default function CartDrawer({
       return;
     }
 
+    const stockUpdate = await decrementCartStock(cartItems);
+    if (!stockUpdate.success) {
+      setOrderError(stockUpdate.error);
+      setPlacing(false);
+      return;
+    }
+
     const finalizedOrder = {
       ...orderObj,
       id: result.id,
       trackingId: result.trackingId || trackingId
+    };
+
+    const handleWhatsAppOrder = () => {
+      const items = cartItems
+        .map((item) => `${item.medicine.name} (${item.quantity}x)`)
+        .join(', ');
+      const message = `Salam MediCure Pharmacy! I want to order: ${items}. Total: PKR ${total.toFixed(2)}. Please contact me for delivery details.`;
+      window.open(`https://wa.me/923342850819?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
     };
 
     if (finalizedOrder.customerEmail) {
@@ -1202,6 +1225,13 @@ export default function CartDrawer({
                 </div>
 
                 {/* Checkout Button */}
+                <button
+                  type="button"
+                  onClick={handleWhatsAppOrder}
+                  className="w-full rounded-xl border border-emerald-500 py-3 font-bold text-sm text-emerald-700 hover:bg-emerald-50 transition"
+                >
+                  Order on WhatsApp
+                </button>
                 <button
                   onClick={() => setIsCheckingOut(true)}
                   className="w-full soft-btn-primary py-3 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2"

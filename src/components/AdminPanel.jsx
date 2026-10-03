@@ -37,6 +37,22 @@ export default function AdminPanel() {
     fetchAdminData();
   }, [activeTab]);
 
+  useEffect(() => {
+    const verifyAdminSession = async () => {
+      const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+      const { data } = await supabase.auth.getUser();
+      if (!adminEmail || !data.user || data.user.email !== adminEmail) {
+        localStorage.removeItem('isAdminLoggedIn');
+        navigate('/');
+      }
+    };
+    verifyAdminSession().catch((error) => {
+      console.error('Admin session verification failed:', error);
+      localStorage.removeItem('isAdminLoggedIn');
+      navigate('/');
+    });
+  }, [navigate]);
+
   const fetchAdminData = async () => {
     if (activeTab === 'products') {
       const { data } = await supabase.from('medicines').select('*');

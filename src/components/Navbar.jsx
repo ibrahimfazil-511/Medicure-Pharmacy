@@ -8,6 +8,7 @@ import {
   Truck,
   PhoneCall,
   ShoppingBag,
+  UserRound,
   Menu,
   X,
   ShieldCheck,
@@ -20,6 +21,7 @@ export default function Navbar({
   onOpenTrackOrder,
   onOpenContactUs,
   onOpenCart,
+  onOpenAccount,
   cartCount,
   onCategoryClick,
   searchQuery,
@@ -162,6 +164,13 @@ export default function Navbar({
               </button>
 
               {/* Cart Drawer Toggle Button */}
+              <button
+                onClick={() => onOpenAccount ? onOpenAccount() : navigate('/account')}
+                className="hidden sm:flex p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-teal-600 shadow-sm transition-all"
+                aria-label="Customer account"
+              >
+                <UserRound className="w-4 h-4" />
+              </button>
               <button
                 onClick={onOpenCart}
                 className="relative p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-teal-600 shadow-sm transition-all hover:bg-slate-50 active:scale-95 cursor-pointer"

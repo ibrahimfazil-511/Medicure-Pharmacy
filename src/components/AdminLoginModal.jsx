@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserCheck, Lock, ShieldCheck, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getSupabase } from '../services/supabaseClient.js';
 
 function AdminLoginModal({ isOpen, onClose }) {
   const [accountName, setAccountName] = useState('');
@@ -12,16 +13,26 @@ function AdminLoginModal({ isOpen, onClose }) {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (accountName === 'admin' && password === 'admin123') {
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+    if (!adminEmail) {
+      setError('Admin authentication is not configured. Set VITE_ADMIN_EMAIL and create this user in Supabase Auth.');
+      return;
+    }
+    getSupabase().auth.signInWithPassword({ email: accountName, password }).then(({ data, error: authError }) => {
+      if (authError || !data.user || data.user.email !== adminEmail) {
+        setError(authError?.message || 'This account is not authorized for the admin portal.');
+        return;
+      }
       localStorage.setItem('isAdminLoggedIn', 'true');
       setError('');
       setAccountName('');
       setPassword('');
       onClose();
       navigate('/admin');
-    } else {
-      setError('Invalid credentials! Please try again.');
-    }
+    }).catch((authError) => {
+      console.error('Admin authentication failed:', authError);
+      setError('Admin authentication failed. Please try again.');
+    });
   };
 
   return (

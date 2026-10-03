@@ -16,6 +16,7 @@ import BrandShowcase from './components/BrandShowcase.jsx';
 import OrderConfirmation from './components/OrderConfirmation.jsx';
 import PromoCarousel from './components/PromoCarousel.jsx';
 import LegalModal from './components/LegalModal.jsx';
+import CustomerAccount from './components/CustomerAccount.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 
 import { fetchMedicines } from './services/supabaseClient.js';
@@ -88,7 +89,44 @@ function ContactPage() {
   );
 }
 
+function AdminGateway() {
+  const navigate = useNavigate();
+
+  return (
+    <AdminLoginModal
+      isOpen={true}
+      onClose={() => navigate('/')}
+    />
+  );
+}
+
 // Main Storefront Component (Homepage Content)
+const CART_STORAGE_KEY = 'medicure_cart_v1';
+
+function loadSavedCart() {
+  try {
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+    if (!savedCart) return [];
+
+    const parsedCart = JSON.parse(savedCart);
+    if (!Array.isArray(parsedCart)) return [];
+
+    return parsedCart.filter((item) => (
+      item
+      && item.medicine
+      && item.medicine.id
+      && Number.isFinite(Number(item.quantity))
+      && Number(item.quantity) > 0
+    )).map((item) => ({
+      ...item,
+      quantity: Math.floor(Number(item.quantity))
+    }));
+  } catch (error) {
+    console.error('Unable to restore saved cart:', error);
+    return [];
+  }
+}
+
 function StoreFront({
   cartItems,
   onAddToCart,
@@ -98,7 +136,6 @@ function StoreFront({
   totalCartCount,
   isCartOpen,
   setIsCartOpen,
-  onOpenAdminPortal
 }) {
   const navigate = useNavigate();
   const [medicines, setMedicines] = useState([]);
@@ -207,6 +244,7 @@ function StoreFront({
         onOpenTrackOrder={() => navigate('/track-order')}
         onOpenContactUs={() => navigate('/contact')}
         onOpenCart={() => setIsCartOpen(true)}
+        onOpenAccount={() => navigate('/account')}
         cartCount={totalCartCount}
         supabaseStatus={{ connected: true, source: dataSource }}
         onOpenSupabaseConfig={() => {
@@ -272,6 +310,13 @@ function StoreFront({
                   <MedicineCard
                     key={medicine.id}
                     medicine={medicine}
+                    alternatives={medicines.filter((candidate) => (
+                      candidate.id !== medicine.id
+                      && Number(candidate.stock) > 0
+                      && medicine.formula
+                      && candidate.formula
+                      && candidate.formula.toLowerCase() === medicine.formula.toLowerCase()
+                    )).slice(0, 2)}
                     onQuickView={handleProductCardClick}
                     onAddToCart={(med) => onAddToCart(med)}
                   />
@@ -367,7 +412,6 @@ function StoreFront({
         onOpenPrescription={() => navigate('/prescription')}
         onOpenTrackOrder={() => navigate('/track-order')}
         onOpenContactUs={() => navigate('/contact')}
-        onOpenAdminPortal={onOpenAdminPortal}
         onOpenLegal={setLegalModal}
         onCategoryClick={(cat) => setSelectedCategory(cat)}
       />
@@ -379,10 +423,34 @@ function StoreFront({
 
 // Root App Component
 export default function App() {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(loadSavedCart);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [completedOrder, setCompletedOrder] = useState(null);
+
+  useEffect(() => {
+    try {
+      if (cartItems.length === 0) {
+        localStorage.removeItem(CART_STORAGE_KEY);
+      } else {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+      }
+    } catch (error) {
+      console.error('Unable to save cart:', error);
+    }
+  }, [cartItems]);
+
+  useEffect(() => {
+    const handleAdminShortcut = (event) => {
+      if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'a') {
+        event.preventDefault();
+        setIsAdminLoginOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleAdminShortcut);
+    return () => window.removeEventListener('keydown', handleAdminShortcut);
+  }, []);
 
   const handleAddToCart = (medicine, qty = 1) => {
     setCartItems((prev) => {
@@ -444,7 +512,6 @@ export default function App() {
               totalCartCount={totalCartCount}
               isCartOpen={isCartOpen}
               setIsCartOpen={setIsCartOpen}
-              onOpenAdminPortal={() => setIsAdminLoginOpen(true)}
             />
           }
         />
@@ -493,6 +560,11 @@ export default function App() {
         <Route
           path="/contact"
           element={<ContactPage />}
+        />
+        <Route path="/account" element={<CustomerAccount />} />
+        <Route
+          path="/staff-gateway-786"
+          element={<AdminGateway />}
         />
         <Route
           path="/admin"

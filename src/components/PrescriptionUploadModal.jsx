@@ -69,6 +69,7 @@ export default function PrescriptionUploadModal({ isOpen, onClose, onPrescriptio
       return;
     }
     setSubmittedRx(rxRecord);
+    localStorage.setItem('medicure_last_prescription_id', rxRecord.id);
     if (onPrescriptionUploaded) onPrescriptionUploaded(rxRecord);
   };
 

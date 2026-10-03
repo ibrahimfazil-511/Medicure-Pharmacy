@@ -438,6 +438,7 @@ export async function saveOrder(order) {
         city: order.city || 'Lahore',
         payment_method: order.paymentMethod || 'Cash on Delivery',
         tracking_code: order.trackingId || null,
+        prescription_id: order.prescriptionId || null,
         subtotal: Number(order.subtotal || 0),
         shipping_fee: Number(order.shippingFee || 0)
       }
@@ -471,6 +472,44 @@ export async function saveOrder(order) {
   } catch (err) {
     console.error('[Supabase Catch Error] Exception in saveOrder:', err);
     return { success: false, error: err.message || 'Unexpected exception saving order' };
+  }
+}
+
+export async function validateCartStock(items) {
+  try {
+    const ids = items.map((item) => item.medicine?.id).filter(Boolean);
+    if (!ids.length) return { success: true, medicines: [] };
+    const { data, error } = await getSupabase().from('medicines').select('id,name,stock').in('id', ids);
+    if (error) throw error;
+    const stockById = new Map((data || []).map((medicine) => [String(medicine.id), medicine]));
+    const unavailable = items.map((item) => {
+      const medicine = stockById.get(String(item.medicine.id));
+      const available = Number(medicine?.stock ?? 0);
+      return medicine && available >= Number(item.quantity) ? null : `${item.medicine.name} has only ${available} left`;
+    }).filter(Boolean);
+    return unavailable.length ? { success: false, error: unavailable.join('. ') } : { success: true, medicines: data || [] };
+  } catch (error) {
+    console.error('[Supabase] Stock validation failed:', error);
+    return { success: false, error: error.message || 'Could not verify stock.' };
+  }
+}
+
+export async function decrementCartStock(items) {
+  try {
+    for (const item of items) {
+      const id = item.medicine?.id;
+      const quantity = Number(item.quantity);
+      if (!id || !Number.isInteger(quantity) || quantity < 1) continue;
+      const { data: current, error: readError } = await getSupabase().from('medicines').select('stock').eq('id', id).single();
+      if (readError) throw readError;
+      if (Number(current.stock) < quantity) return { success: false, error: `${item.medicine.name} is no longer available in the requested quantity.` };
+      const { error } = await getSupabase().from('medicines').update({ stock: Number(current.stock) - quantity }).eq('id', id).eq('stock', current.stock);
+      if (error) throw error;
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('[Supabase] Stock deduction failed:', error);
+    return { success: false, error: error.message || 'Stock could not be updated.' };
   }
 }
 
@@ -531,9 +570,9 @@ CREATE TABLE IF NOT EXISTS orders (
 ALTER TABLE medicines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE medicines ADD COLUMN IF NOT EXISTS discount NUMERIC(5,2) DEFAULT 0;
 CREATE POLICY "Public Read Access for Medicines" ON medicines FOR SELECT USING (true);
-CREATE POLICY "Public Insert Access for Medicines" ON medicines FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public Update Access for Medicines" ON medicines FOR UPDATE USING (true) WITH CHECK (true);
-CREATE POLICY "Public Delete Access for Medicines" ON medicines FOR DELETE USING (true);
+CREATE POLICY "Admin Insert Access for Medicines" ON medicines FOR INSERT TO authenticated WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin Update Access for Medicines" ON medicines FOR UPDATE TO authenticated USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin') WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin Delete Access for Medicines" ON medicines FOR DELETE TO authenticated USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- ============================================================
 -- 5. LIVE REVIEWS / RATINGS SYSTEM  (NEW)
