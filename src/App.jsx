@@ -19,7 +19,7 @@ import LegalModal from './components/LegalModal.jsx';
 import CustomerAccount from './components/CustomerAccount.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 
-import { fetchMedicines } from './services/supabaseClient.js';
+import { fetchMedicines, getSupabase } from './services/supabaseClient.js';
 import { Flame, ArrowRight } from 'lucide-react';
 
 // Dedicated Route Wrapper for Track Order Page / Modal
@@ -98,6 +98,31 @@ function AdminGateway() {
       onClose={() => navigate('/')}
     />
   );
+}
+
+function AdminRoute() {
+  const [session, setSession] = useState(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    const client = getSupabase();
+    client.auth.getSession().then(({ data }) => {
+      const adminEmail = import.meta.env.VITE_ADMIN_EMAIL?.trim().toLowerCase();
+      const user = data.session?.user;
+      const isAdmin = user && adminEmail && user.email?.toLowerCase() === adminEmail;
+      if (mounted) setSession(isAdmin ? data.session : null);
+    });
+    const { data: listener } = client.auth.onAuthStateChange((_event, nextSession) => {
+      if (mounted) setSession(nextSession || null);
+    });
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (session === undefined) return null;
+  return session ? <AdminPanel /> : <Navigate to="/" replace />;
 }
 
 // Main Storefront Component (Homepage Content)
@@ -453,16 +478,23 @@ export default function App() {
   }, []);
 
   const handleAddToCart = (medicine, qty = 1) => {
+    if (!medicine?.id) {
+      console.error('Unable to add medicine without an id to cart.');
+      return;
+    }
+
+    const requestedQuantity = Math.max(1, Math.floor(Number(qty) || 1));
     setCartItems((prev) => {
       const existingIndex = prev.findIndex((i) => i.medicine.id === medicine.id);
       if (existingIndex > -1) {
         const updated = [...prev];
-        updated[existingIndex].quantity += qty;
+        updated[existingIndex].quantity += requestedQuantity;
         return updated;
       }
-      return [...prev, { medicine, quantity: qty }];
+      return [...prev, { medicine, quantity: requestedQuantity }];
     });
     setIsCartOpen(true);
+    requestAnimationFrame(() => setIsCartOpen(true));
   };
 
   const handleUpdateQuantity = (medicineId, newQty) => {
@@ -562,14 +594,8 @@ export default function App() {
           element={<ContactPage />}
         />
         <Route path="/account" element={<CustomerAccount />} />
-        <Route
-          path="/staff-gateway-786"
-          element={<AdminGateway />}
-        />
-        <Route
-          path="/admin"
-          element={localStorage.getItem('isAdminLoggedIn') === 'true' ? <AdminPanel /> : <Navigate to="/" replace />}
-        />
+        <Route path="/staff-gateway-786" element={<AdminGateway />} />
+        <Route path="/staff-gateway-786/panel" element={<AdminRoute />} />
         {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

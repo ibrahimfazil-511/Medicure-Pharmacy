@@ -14,7 +14,7 @@ const normalizePhone = (phone) => {
 
 export default function MediCureOrderSystem({ isOpen, onClose, cartItems, customerInfo }) {
   const [trackingInput, setTrackingInput] = useState('MED-');
-  const [phoneInput, setPhoneInput] = useState(''); 
+  const [phoneInput, setPhoneInput] = useState('');
   const [activeOrder, setActiveOrder] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -97,25 +97,16 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
     setErrorMessage('');
 
     try {
-      const { data: orders, error } = await supabase
-        .from('orders')
-        .select('*');
+      const { data: order, error } = await supabase.rpc('track_order', {
+        p_tracking_code: queryId,
+        p_phone: `92${phoneInput}`
+      });
 
       if (error) {
         throw error;
       }
 
-      console.log('Fetched Orders from DB:', orders);
-
-      const foundOrder = (orders || []).find((order) => {
-        const trackingCode = order.items?.shipping?.tracking_code || order.id;
-        const dbId = String(trackingCode || '').trim().toUpperCase();
-        
-        const storedPhone = order.phone || order.items?.shipping?.phone;
-        const dbPhone = normalizePhone(storedPhone);
-        
-        return dbId === queryId && dbPhone === queryPhone;
-      });
+      const foundOrder = Array.isArray(order) ? order[0] : order;
 
       if (!foundOrder) {
         setActiveOrder(null);
@@ -143,7 +134,7 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
           status_text: currentStatus,
           items: Array.isArray(foundOrder.items) ? foundOrder.items : (foundOrder.items?.cart || [])
         };
-        
+
         setActiveOrder(formattedOrder);
         setErrorMessage('');
       }
@@ -167,14 +158,14 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div 
-        className="absolute inset-0" 
-        onClick={onClose} 
+      <div
+        className="absolute inset-0"
+        onClick={onClose}
       />
       <div className="soft-card w-full max-w-2xl bg-[#f4f8f8] p-4 sm:p-6 md:p-8 relative border border-white rounded-2xl sm:rounded-3xl shadow-2xl max-h-[92dvh] overflow-y-auto z-10 no-scrollbar">
-        
+
         {/* Close Button */}
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-xl soft-btn text-slate-600 hover:text-slate-900 active:scale-95 transition-all"
           aria-label="Close"
@@ -251,7 +242,7 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
         {/* Display Order Details if Found */}
         {activeOrder && (
           <div className="space-y-6">
-            
+
             <div className="p-4 rounded-2xl soft-inset bg-slate-200/50 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-300/50 pb-2">
                 <div>
@@ -336,19 +327,17 @@ export default function MediCureOrderSystem({ isOpen, onClose, cartItems, custom
 
                   return (
                     <div key={step.number} className="relative flex items-start gap-4 z-10 pl-1">
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-all ${
-                        isCompleted 
-                          ? 'bg-teal-600 text-white shadow-md shadow-teal-500/30' 
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-all ${isCompleted
+                          ? 'bg-teal-600 text-white shadow-md shadow-teal-500/30'
                           : 'bg-slate-300 text-slate-600'
-                      }`}>
+                        }`}>
                         {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : step.number}
                       </div>
 
-                      <div className={`p-3 rounded-xl w-full transition-all ${
-                        isCurrent 
-                          ? 'soft-card border border-teal-400 bg-teal-50/50' 
+                      <div className={`p-3 rounded-xl w-full transition-all ${isCurrent
+                          ? 'soft-card border border-teal-400 bg-teal-50/50'
                           : 'bg-slate-100/60'
-                      }`}>
+                        }`}>
                         <div className="flex items-center justify-between">
                           <h5 className={`text-xs font-bold ${isCompleted ? 'text-slate-900' : 'text-slate-500'}`}>
                             {step.title}

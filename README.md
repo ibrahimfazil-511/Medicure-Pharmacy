@@ -32,3 +32,9 @@ supabase secrets set ORDER_EMAIL_FROM="MediCure Pharmacy <orders@your-verified-d
 ```
 
 `ORDER_EMAIL_FROM` must use a sender domain verified in Resend. During testing, Resend's `onboarding@resend.dev` sender can only deliver to the Resend account email. Customers receive an email only when they enter a valid email at checkout.
+
+## Supabase security setup
+
+Apply `supabase/migrations/20261004000000_atomic_order_stock.sql` before accepting orders. Checkout uses the `place_order` RPC so stock deduction and order creation are atomic. The `track_order` RPC returns only the order matching the supplied tracking code and phone number.
+
+Set `VITE_ADMIN_EMAIL` to the admin Auth user's email. In Supabase Auth, set that user's `app_metadata` role to `admin`; this role is required by the RLS policies for inventory and order management. The staff portal is intentionally available only at `/staff-gateway-786` and uses the Supabase session, not a browser `localStorage` flag.

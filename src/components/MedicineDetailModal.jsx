@@ -430,7 +430,7 @@ export default function MedicineDetailModal({
   onOpenCart,
   cartCount = 0,
   searchQuery = '',
-  setSearchQuery = () => {},
+  setSearchQuery = () => { },
   onCategoryClick,
   onSelectMedicine,
 }) {
@@ -486,9 +486,11 @@ export default function MedicineDetailModal({
   // Handle body overflow, instant scroll reset to top, and state reset on medicine change
   useEffect(() => {
     if (!medicine) return;
-    
+
     const original = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    if (onClose) {
+      document.body.style.overflow = 'hidden';
+    }
 
     // Instant top scroll reset for modal container & window
     const modalContainer = document.getElementById('medicine-detail-modal-container');
@@ -506,8 +508,10 @@ export default function MedicineDetailModal({
     setReviewText('');
     setSubmitMsg(null);
 
-    return () => { document.body.style.overflow = original; };
-  }, [medicineId]);
+    return () => {
+      if (onClose) document.body.style.overflow = original;
+    };
+  }, [medicineId, onClose]);
 
   // Fetch rating & reviews
   useEffect(() => {
@@ -589,7 +593,22 @@ export default function MedicineDetailModal({
 
   // Main detail add to cart handler
   const handleAdd = () => {
-    onAddToCart?.(medicine, quantity);
+    const availableStock = medicine.stock === null
+      || medicine.stock === undefined
+      || medicine.stock === ''
+      ? Infinity
+      : Number(medicine.stock);
+
+    if (availableStock <= 0) {
+      setSubmitMsg({ type: 'error', text: 'This product is currently out of stock.' });
+      return;
+    }
+
+    const safeQuantity = Math.min(quantity, availableStock);
+    if (safeQuantity !== quantity) {
+      setQuantity(safeQuantity);
+    }
+    onAddToCart?.(medicine, safeQuantity);
     setAdded(true);
     setTimeout(() => {
       setAdded(false);
@@ -692,7 +711,7 @@ export default function MedicineDetailModal({
         onCategoryClick={onCategoryClick}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        showBackToHome={true}  
+        showBackToHome={true}
         hideSearch={true}
         onBack={handleBack}
       />
@@ -834,9 +853,8 @@ export default function MedicineDetailModal({
                   </div>
 
                   <button onClick={handleAdd}
-                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-bold shadow-md transition-all active:scale-95 ${
-                      added ? 'bg-emerald-500 text-white' : 'bg-white text-teal-900 hover:bg-teal-50'
-                    }`}>
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-bold shadow-md transition-all active:scale-95 ${added ? 'bg-emerald-500 text-white' : 'bg-white text-teal-900 hover:bg-teal-50'
+                      }`}>
                     {added ? <Check className="h-3.5 w-3.5" /> : <ShoppingBag className="h-3.5 w-3.5" />}
                     <span className="whitespace-nowrap">{added ? 'Added!' : 'Add to Cart'}</span>
                   </button>
@@ -908,9 +926,8 @@ export default function MedicineDetailModal({
                     onClick={() => setUserRating(n)}
                     className="p-0.5 transition active:scale-90"
                     aria-label={`Rate ${n} star`}>
-                    <Star className={`h-7 w-7 transition ${
-                      n <= (hoverRating || userRating) ? 'fill-amber-400 text-amber-400' : 'text-slate-300'
-                    }`} />
+                    <Star className={`h-7 w-7 transition ${n <= (hoverRating || userRating) ? 'fill-amber-400 text-amber-400' : 'text-slate-300'
+                      }`} />
                   </button>
                 ))}
                 {userRating > 0 && <span className="ml-2 text-xs font-bold text-amber-700">{userRating} / 5</span>}
@@ -925,16 +942,15 @@ export default function MedicineDetailModal({
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs outline-none focus:ring-2 focus:ring-teal-500 resize-none" />
 
               {submitMsg && (
-                <div className={`text-[11px] font-bold p-2.5 rounded-lg ${
-                  submitMsg.type === 'error' ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                }`}>{submitMsg.text}</div>
+                <div className={`text-[11px] font-bold p-2.5 rounded-lg ${submitMsg.type === 'error' ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                    : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  }`}>{submitMsg.text}</div>
               )}
 
               <button type="submit" disabled={submitting || !userRating}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-[0.99]">
                 {submitting ? (<><Loader2 className="h-4 w-4 animate-spin" /> Posting…</>)
-                : (<><MessageSquarePlus className="h-4 w-4" /> Submit Review</>)}
+                  : (<><MessageSquarePlus className="h-4 w-4" /> Submit Review</>)}
               </button>
             </form>
           </div>

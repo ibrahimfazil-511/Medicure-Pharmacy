@@ -111,7 +111,11 @@ export const getWhatsAppLink = (order) => {
   const city = shipping.city || order.city || 'City not provided';
   const delivery = deliveryFee > 0 ? `PKR ${deliveryFee.toFixed(2)}` : 'FREE';
 
-  const message = `Hello ${customerName}, this is MediCure Pharmacy regarding your order.\n\nOrder ID: #${order.id}\nTracking ID: ${trackingCode}\nCustomer Name: ${customerName}\nOrder Item(s): ${itemNames}\nAddress: ${address}, ${city}\nStatus: ${status}\nSubtotal: PKR ${subtotal.toFixed(2)}\nDelivery Charges: ${delivery}\nTotal Amount: PKR ${totalAmount.toFixed(2)}\n\nOur team is currently preparing your order. Please reply here if you have any questions or need to send additional prescription details.`;
+  const paymentMethod = shipping.payment_method || order.paymentMethod || 'Cash on Delivery';
+  const payDetails = shipping.payment_details;
+  const payRef = payDetails?.transactionId ? ` (TID: ${payDetails.transactionId})` : payDetails?.referenceId ? ` (Ref: ${payDetails.referenceId})` : '';
+
+  const message = `Hello ${customerName}, this is MediCure Pharmacy regarding your order.\n\nOrder ID: #${order.id}\nTracking ID: ${trackingCode}\nCustomer Name: ${customerName}\nOrder Item(s): ${itemNames}\nAddress: ${address}, ${city}\nPayment Method: ${paymentMethod}${payRef}\nStatus: ${status}\nSubtotal: PKR ${subtotal.toFixed(2)}\nDelivery Charges: ${delivery}\nTotal Amount: PKR ${totalAmount.toFixed(2)}\n\nOur team is currently preparing your order. Please reply here if you have any questions or need to send additional prescription details.`;
 
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 };
@@ -672,16 +676,33 @@ export default function CustomerOrders() {
                         </div>
                       </td>
 
-                      {/* TOTAL AMOUNT Column */}
+                      {/* TOTAL AMOUNT & PAYMENT Column */}
                       <td className="py-3.5 px-4 align-middle">
                         <div>
                           <span className="font-black text-teal-800 text-sm">
                             PKR {parseFloat(order.total_amount || 0).toFixed(2)}
                           </span>
-                          <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5 font-medium">
+                          <div className="flex flex-wrap items-center gap-1.5 text-[10px] mt-1 font-medium">
                             <span className="text-slate-600 font-bold">{itemsCount} item{itemsCount > 1 ? 's' : ''}</span>
                             <span>•</span>
-                            <span>{paymentMethod}</span>
+                            <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] border ${
+                              paymentMethod.includes('Jazz')
+                                ? 'bg-red-50 text-red-700 border-red-200'
+                                : paymentMethod.includes('Easy')
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : paymentMethod.includes('Card')
+                                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                : paymentMethod.includes('Bank')
+                                ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                : 'bg-slate-100 text-slate-700 border-slate-200'
+                            }`}>
+                              {paymentMethod}
+                            </span>
+                            {order.items?.shipping?.payment_details?.transactionId && (
+                              <span className="font-mono text-[9px] text-slate-500 font-semibold bg-slate-50 px-1 rounded border border-slate-200">
+                                TID: {order.items.shipping.payment_details.transactionId}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -914,11 +935,46 @@ export default function CustomerOrders() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 pt-1 text-slate-600">
-                    <CreditCard className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="font-semibold">
-                      Payment Method: <strong className="text-slate-900">{selectedOrder.items?.shipping?.payment_method || selectedOrder.paymentMethod || 'Cash on Delivery'}</strong>
-                    </span>
+                  <div className="flex flex-col gap-1 pt-2 border-t border-slate-100 text-slate-600">
+                    <div className="flex items-center gap-1.5">
+                      <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="font-semibold">
+                        Payment Method: <strong className="text-slate-900">{selectedOrder.items?.shipping?.payment_method || selectedOrder.paymentMethod || 'Cash on Delivery'}</strong>
+                      </span>
+                    </div>
+
+                    {selectedOrder.items?.shipping?.payment_details?.transactionId && (
+                      <div className="text-[11px] bg-slate-50 p-2 rounded-lg border border-slate-200 mt-1 space-y-0.5">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Transaction ID (TID):</span>
+                          <strong className="font-mono text-teal-800">{selectedOrder.items.shipping.payment_details.transactionId}</strong>
+                        </div>
+                        {selectedOrder.items.shipping.payment_details.senderNumber && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">Sender Account:</span>
+                            <span className="font-mono text-slate-800">{selectedOrder.items.shipping.payment_details.senderNumber}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {selectedOrder.items?.shipping?.payment_details?.referenceId && (
+                      <div className="text-[11px] bg-slate-50 p-2 rounded-lg border border-slate-200 mt-1">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Bank Reference ID:</span>
+                          <strong className="font-mono text-purple-800">{selectedOrder.items.shipping.payment_details.referenceId}</strong>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedOrder.items?.shipping?.payment_details?.cardLast4 && (
+                      <div className="text-[11px] bg-slate-50 p-2 rounded-lg border border-slate-200 mt-1">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Card Authorized:</span>
+                          <strong className="font-mono text-blue-800">&bull;&bull;&bull;&bull; {selectedOrder.items.shipping.payment_details.cardLast4} ({selectedOrder.items.shipping.payment_details.cardBrand || 'Card'})</strong>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -18,34 +18,42 @@ Deno.serve(async (request) => {
   }
 
   try {
-    const { orderId } = await request.json();
-    if (!orderId) {
-      return new Response(JSON.stringify({ error: 'orderId is required' }), {
+    const body = await request.json();
+    const orderId = body?.orderId;
+    let order = body?.order;
+
+    if (!orderId && !order) {
+      return new Response(JSON.stringify({ error: 'orderId or order data is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-      { auth: { persistSession: false } }
-    );
+    if (!order && orderId) {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+        { auth: { persistSession: false } }
+      );
 
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .select('id, customer_name, customer_email, total_amount, items, status, created_at')
-      .eq('id', orderId)
-      .single();
+      const { data: fetchedOrder, error: orderError } = await supabase
+        .from('orders')
+        .select('id, customer_name, customer_email, total_amount, items, status, created_at')
+        .eq('id', orderId)
+        .single();
 
-    if (orderError || !order) {
-      return new Response(JSON.stringify({ error: orderError?.message || 'Order not found' }), {
-        status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      if (orderError || !fetchedOrder) {
+        return new Response(JSON.stringify({ error: orderError?.message || 'Order not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      order = fetchedOrder;
     }
 
-    if (!order.customer_email) {
+    // Normalize customer email
+    const recipientEmail = order.customer_email || order.customerEmail;
+    if (!recipientEmail) {
       return new Response(JSON.stringify({ skipped: true, reason: 'Customer email was not provided' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -59,7 +67,7 @@ Deno.serve(async (request) => {
       },
       body: JSON.stringify({
         from: Deno.env.get('ORDER_EMAIL_FROM'),
-        to: [order.customer_email],
+        to: [recipientEmail],
         subject: `MediCure Pharmacy order confirmation #${order.id}`,
         html: buildEmailHtml(order)
       })
@@ -106,6 +114,8 @@ function buildEmailHtml(order: any) {
         <tbody>${itemRows}</tbody>
       </table>
       <p><strong>Total: Rs ${Number(order.total_amount || 0).toFixed(2)}</strong></p>
+      <p><strong>Payment Method:</strong> ${escapeHtml(shipping.payment_method || 'Cash on Delivery')}</p>
+      ${shipping.tracking_code ? `<p><strong>Tracking ID:</strong> ${escapeHtml(shipping.tracking_code)}</p>` : ''}
       <p><strong>Delivery address:</strong> ${escapeHtml(shipping.address)}, ${escapeHtml(shipping.city)}</p>
       <p>We will contact you regarding delivery. Thank you for choosing MediCure Pharmacy.</p>
     </div>`;

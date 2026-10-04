@@ -16,9 +16,9 @@ export default function AdminPanel() {
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedInquiry, setSelectedInquiry] = useState(null); // Modal state for inquiry details
-  const [editingId, setEditingId] = useState(null); 
+  const [editingId, setEditingId] = useState(null);
   const navigate = useNavigate();
-  
+
   // New / Edit Medicine Form State
   const [newMed, setNewMed] = useState({
     name: '',
@@ -40,15 +40,16 @@ export default function AdminPanel() {
   useEffect(() => {
     const verifyAdminSession = async () => {
       const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-      const { data } = await supabase.auth.getUser();
-      if (!adminEmail || !data.user || data.user.email !== adminEmail) {
-        localStorage.removeItem('isAdminLoggedIn');
+      const { data, error } = await supabase.auth.getUser();
+      const user = data?.user;
+      const isAdmin = user && adminEmail && user.email?.toLowerCase() === adminEmail.trim().toLowerCase();
+      if (error || !isAdmin) {
+        await supabase.auth.signOut();
         navigate('/');
       }
     };
     verifyAdminSession().catch((error) => {
       console.error('Admin session verification failed:', error);
-      localStorage.removeItem('isAdminLoggedIn');
       navigate('/');
     });
   }, [navigate]);
@@ -90,7 +91,7 @@ export default function AdminPanel() {
       }
 
       const { data } = supabase.storage.from('medicines').getPublicUrl(filePath);
-      
+
       setNewMed({ ...newMed, image_url: data.publicUrl });
       alert('Image uploaded successfully!');
     } catch (error) {
@@ -212,14 +213,13 @@ export default function AdminPanel() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAdminLoggedIn');
-    navigate('/');
+    supabase.auth.signOut().finally(() => navigate('/'));
   };
 
   return (
     <div className="soft-canvas min-h-screen p-3 sm:p-6 lg:p-8 font-sans text-slate-800 relative">
       <div className="max-w-7xl mx-auto space-y-6">
-        
+
         {/* Top Header Bar */}
         <div className="soft-card flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white/85 backdrop-blur-md p-4 sm:p-5 rounded-2xl gap-4">
           <div className="flex items-center gap-3">
@@ -231,7 +231,7 @@ export default function AdminPanel() {
               <p className="text-xs text-slate-500">Manage your pharmacy inventory, orders, and client prescriptions.</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
             <button
               onClick={() => navigate('/')}
@@ -252,41 +252,37 @@ export default function AdminPanel() {
         <div className="flex overflow-x-auto no-scrollbar touch-scroll gap-1.5 sm:gap-2 bg-white/60 p-1.5 sm:p-2 rounded-2xl border border-slate-200/60 backdrop-blur-sm">
           <button
             onClick={() => setActiveTab('products')}
-            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${
-              activeTab === 'products' 
-                ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' 
+            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${activeTab === 'products'
+                ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20'
                 : 'bg-transparent text-slate-600 hover:bg-white/80 hover:text-teal-700'
-            }`}
+              }`}
           >
             <Package className="w-4 h-4" /> Manage Products
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${
-              activeTab === 'orders' 
-                ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' 
+            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${activeTab === 'orders'
+                ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20'
                 : 'bg-transparent text-slate-600 hover:bg-white/80 hover:text-teal-700'
-            }`}
+              }`}
           >
             <ShoppingBag className="w-4 h-4" /> Customer Orders
           </button>
           <button
             onClick={() => setActiveTab('prescriptions')}
-            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${
-              activeTab === 'prescriptions' 
-                ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' 
+            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all ${activeTab === 'prescriptions'
+                ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20'
                 : 'bg-transparent text-slate-600 hover:bg-white/80 hover:text-teal-700'
-            }`}
+              }`}
           >
             <FileText className="w-4 h-4" /> Prescriptions
           </button>
           <button
             onClick={() => setActiveTab('inquiries')}
-            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all relative ${
-              activeTab === 'inquiries' 
-                ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' 
+            className={`flex items-center gap-2 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm shrink-0 transition-all relative ${activeTab === 'inquiries'
+                ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20'
                 : 'bg-transparent text-slate-600 hover:bg-white/80 hover:text-teal-700'
-            }`}
+              }`}
           >
             <Mail className="w-4 h-4" /> Inquiries
             {inquiries.length > 0 && (
@@ -305,7 +301,7 @@ export default function AdminPanel() {
                 <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
                   <div className="p-2 rounded-xl bg-teal-50 text-teal-600">
                     {editingId ? <Edit3 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                  </div> 
+                  </div>
                   {editingId ? 'Edit Medicine' : 'Add New Medicine'}
                 </h2>
                 {editingId && (
@@ -314,7 +310,7 @@ export default function AdminPanel() {
                   </button>
                 )}
               </div>
-              
+
               <form onSubmit={handleFormSubmit} className="space-y-3.5">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">Medicine Name</label>
@@ -471,8 +467,8 @@ export default function AdminPanel() {
                   />
                 </div>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="w-full py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-lg shadow-teal-500/20 transition mt-2"
                 >
                   {editingId ? 'Update Medicine' : 'Save Medicine to Inventory'}
@@ -507,10 +503,10 @@ export default function AdminPanel() {
                       <tr key={med.id} className="hover:bg-slate-50/80 transition">
                         <td className="p-3">
                           {med.image_url ? (
-                            <img 
-                              src={med.image_url} 
-                              alt="" 
-                              className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0 cursor-pointer hover:opacity-80 shadow-sm" 
+                            <img
+                              src={med.image_url}
+                              alt=""
+                              className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0 cursor-pointer hover:opacity-80 shadow-sm"
                               onClick={() => setSelectedImage(med.image_url)}
                             />
                           ) : (
@@ -533,9 +529,8 @@ export default function AdminPanel() {
                           )}
                         </td>
                         <td className="p-3 truncate">
-                          <span className={`px-2 py-1 rounded-xl text-[10px] font-bold inline-block ${
-                            med.stock > 10 ? 'bg-teal-50 text-teal-700' : 'bg-rose-50 text-rose-700'
-                          }`}>
+                          <span className={`px-2 py-1 rounded-xl text-[10px] font-bold inline-block ${med.stock > 10 ? 'bg-teal-50 text-teal-700' : 'bg-rose-50 text-rose-700'
+                            }`}>
                             {med.stock} left
                           </span>
                         </td>
@@ -588,7 +583,7 @@ export default function AdminPanel() {
                         <p className="font-bold text-xs text-slate-800 truncate">Phone: {item.patient_phone || 'N/A'}</p>
                       </div>
                       {item.file_name ? (
-                        <div 
+                        <div
                           className="w-full h-32 rounded-xl overflow-hidden bg-white border border-slate-200 cursor-pointer group relative"
                           onClick={() => setSelectedImage(item.file_name)}
                         >
@@ -601,7 +596,7 @@ export default function AdminPanel() {
                     </div>
 
                     {item.file_name && (
-                      <button 
+                      <button
                         onClick={() => setSelectedImage(item.file_name)}
                         className="text-teal-600 hover:text-teal-700 text-[11px] font-bold truncate text-left bg-teal-50 hover:bg-teal-100 p-2 rounded-xl transition block w-full mt-2"
                         title={item.file_name}
@@ -675,14 +670,14 @@ export default function AdminPanel() {
       {/* Image Preview Modal */}
       {selectedImage && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div 
+          <div
             className="absolute inset-0"
             onClick={() => setSelectedImage(null)}
           />
           <div className="soft-card bg-white p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl max-w-2xl w-full relative z-10 shadow-2xl space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-slate-700 truncate max-w-[90%] font-mono">{selectedImage}</h3>
-              <button 
+              <button
                 onClick={() => setSelectedImage(null)}
                 className="p-2 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 transition active:scale-95"
                 aria-label="Close"
@@ -700,7 +695,7 @@ export default function AdminPanel() {
       {/* Inquiry Details Modal */}
       {selectedInquiry && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div 
+          <div
             className="absolute inset-0"
             onClick={() => setSelectedInquiry(null)}
           />
@@ -710,7 +705,7 @@ export default function AdminPanel() {
                 <h3 className="text-sm font-black text-slate-900">Inquiry #{selectedInquiry.id}</h3>
                 <p className="text-[10px] text-slate-400">Received on {selectedInquiry.created_at ? new Date(selectedInquiry.created_at).toLocaleString() : 'N/A'}</p>
               </div>
-              <button 
+              <button
                 onClick={() => setSelectedInquiry(null)}
                 className="p-2 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 transition active:scale-95"
                 aria-label="Close"
@@ -718,7 +713,7 @@ export default function AdminPanel() {
                 <X size={18} />
               </button>
             </div>
-            
+
             <div className="space-y-3 text-xs">
               <p><strong className="text-slate-400 uppercase tracking-wider block mb-0.5">Name</strong> <span className="text-slate-800 font-bold text-sm">{selectedInquiry.name}</span></p>
               <p><strong className="text-slate-400 uppercase tracking-wider block mb-0.5">Phone</strong> <span className="text-slate-800 font-bold text-sm">{selectedInquiry.phone || 'N/A'}</span></p>
@@ -731,7 +726,7 @@ export default function AdminPanel() {
             </div>
 
             <div className="pt-2 flex justify-end">
-              <button 
+              <button
                 onClick={() => setSelectedInquiry(null)}
                 className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition active:scale-95"
               >

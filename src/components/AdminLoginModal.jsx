@@ -1,52 +1,59 @@
 import React, { useState } from 'react';
-import { UserCheck, Lock, ShieldCheck, X } from 'lucide-react';
+import { Mail, Lock, ShieldCheck, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getSupabase } from '../services/supabaseClient.js';
 
 function AdminLoginModal({ isOpen, onClose }) {
-  const [accountName, setAccountName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   if (!isOpen) return null;
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-    if (!adminEmail) {
-      setError('Admin authentication is not configured. Set VITE_ADMIN_EMAIL and create this user in Supabase Auth.');
-      return;
-    }
-    getSupabase().auth.signInWithPassword({ email: accountName, password }).then(({ data, error: authError }) => {
-      if (authError || !data.user || data.user.email !== adminEmail) {
-        setError(authError?.message || 'This account is not authorized for the admin portal.');
-        return;
+    setError('');
+    setLoading(true);
+
+    try {
+      const { data, error: authError } = await getSupabase().auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
+
+      if (authError) {
+        throw authError;
       }
-      localStorage.setItem('isAdminLoggedIn', 'true');
-      setError('');
-      setAccountName('');
-      setPassword('');
-      onClose();
-      navigate('/admin');
-    }).catch((authError) => {
+
+      if (data?.user) {
+        setError('');
+        setEmail('');
+        setPassword('');
+        onClose();
+        navigate('/staff-gateway-786/panel');
+      }
+    } catch (authError) {
       console.error('Admin authentication failed:', authError);
-      setError('Admin authentication failed. Please try again.');
-    });
+      setError(authError.message || 'Invalid email or password. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div 
-        className="absolute inset-0" 
-        onClick={onClose} 
+      <div
+        className="absolute inset-0"
+        onClick={onClose}
       />
       <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 max-w-md w-full shadow-2xl relative z-10 space-y-5 sm:space-y-6 border border-slate-100 my-auto">
-        
+
         {/* Close Button */}
-        <button 
+        <button
           type="button"
-          onClick={onClose} 
+          onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 bg-slate-100 p-2 rounded-full transition active:scale-95 z-10"
           aria-label="Close"
         >
@@ -70,17 +77,17 @@ function AdminLoginModal({ isOpen, onClose }) {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-700">Account Name</label>
+            <label className="text-xs font-bold text-slate-700">Email Address</label>
             <div className="flex items-center gap-2 px-3.5 py-2.5 sm:py-2 rounded-xl bg-slate-100 border border-slate-200 focus-within:ring-2 focus-within:ring-teal-500">
-              <UserCheck className="w-4 h-4 text-slate-400 shrink-0" />
-              <input 
-                type="text" 
+              <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+              <input
+                type="email"
                 required
-                name="account_name"
-                autoComplete="off"
-                placeholder="Enter Account Name"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
+                name="admin_email"
+                autoComplete="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="bg-transparent border-none outline-none text-sm sm:text-xs w-full text-slate-800"
               />
             </div>
@@ -90,11 +97,11 @@ function AdminLoginModal({ isOpen, onClose }) {
             <label className="text-xs font-bold text-slate-700">Password</label>
             <div className="flex items-center gap-2 px-3.5 py-2.5 sm:py-2 rounded-xl bg-slate-100 border border-slate-200 focus-within:ring-2 focus-within:ring-teal-500">
               <Lock className="w-4 h-4 text-slate-400 shrink-0" />
-              <input 
-                type="password" 
+              <input
+                type="password"
                 required
                 name="admin_password"
-                autoComplete="new-password"
+                autoComplete="current-password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -103,11 +110,12 @@ function AdminLoginModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            className="w-full py-3 sm:py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm shadow-lg transition active:scale-[0.99]"
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 sm:py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm shadow-lg transition active:scale-[0.99] disabled:opacity-50"
           >
-            Authenticate & Login
+            {loading ? 'Authenticating...' : 'Authenticate & Login'}
           </button>
         </form>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle2, Clipboard, MapPin, Phone, ReceiptText, ShieldCheck, Truck, UserRound, Search, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clipboard, MapPin, Phone, ReceiptText, ShieldCheck, Truck, UserRound, Search, AlertCircle, CreditCard, Smartphone, Building2, Mail } from 'lucide-react';
+import { sendOrderEmail } from '../services/supabaseClient.js';
 
 function Detail({ label, value }) {
   return (
@@ -15,6 +16,8 @@ export default function OrderConfirmation({ order, onContinueShopping }) {
   const [phoneInput, setPhoneInput] = useState('+92');
   const [trackStatus, setTrackStatus] = useState(null); // 'success' | 'error' | null
   const [errorMessage, setErrorMessage] = useState('');
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [emailStatusMsg, setEmailStatusMsg] = useState(null);
 
   if (!order) return null;
   const itemCount = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
@@ -137,7 +140,42 @@ export default function OrderConfirmation({ order, onContinueShopping }) {
               <div className="soft-card p-5 sm:p-6">
                 <div className="mb-5 flex items-center gap-2 border-b border-slate-200 pb-4"><Clipboard className="h-5 w-5 text-teal-600" /><h2 className="text-lg font-black text-slate-900">Order summary</h2></div>
                 <div className="space-y-3 text-sm"><div className="flex justify-between gap-4 text-slate-600"><span>Subtotal</span><strong className="text-slate-900">Rs {order.subtotal?.toFixed(2)}</strong></div><div className="flex justify-between gap-4 text-slate-600"><span>Delivery charges</span><strong className="text-slate-900">{order.shippingFee ? `Rs ${order.shippingFee.toFixed(2)}` : 'FREE'}</strong></div><div className="flex justify-between gap-4 border-t border-slate-200 pt-4 text-base font-black"><span>Total amount</span><strong className="text-teal-700">Rs {order.total?.toFixed(2)}</strong></div></div>
-                <div className="mt-5 rounded-xl bg-teal-50 p-4"><p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Payment method</p><p className="mt-1 font-black text-teal-800">{order.paymentMethod}</p></div>
+                <div className="mt-5 rounded-2xl bg-teal-50/90 border border-teal-200/80 p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Payment Method</p>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-300">
+                      {order.paymentDetails?.channel || (order.paymentMethod?.includes('Card') ? 'Card' : order.paymentMethod?.includes('Jazz') ? 'JazzCash' : order.paymentMethod?.includes('Easy') ? 'EasyPaisa' : 'Cash')}
+                    </span>
+                  </div>
+                  <p className="font-black text-slate-900 text-sm">{order.paymentMethod || 'Cash on Delivery'}</p>
+                  
+                  {order.paymentDetails?.transactionId && (
+                    <div className="pt-2 border-t border-teal-200/60 flex items-center justify-between text-xs">
+                      <span className="text-slate-600">Transaction ID / TID:</span>
+                      <span className="font-mono font-bold text-teal-900">{order.paymentDetails.transactionId}</span>
+                    </div>
+                  )}
+
+                  {order.paymentDetails?.referenceId && (
+                    <div className="pt-2 border-t border-teal-200/60 flex items-center justify-between text-xs">
+                      <span className="text-slate-600">Bank Reference:</span>
+                      <span className="font-mono font-bold text-teal-900">{order.paymentDetails.referenceId}</span>
+                    </div>
+                  )}
+
+                  {order.paymentDetails?.cardLast4 && (
+                    <div className="pt-2 border-t border-teal-200/60 flex items-center justify-between text-xs">
+                      <span className="text-slate-600">Card ending in:</span>
+                      <span className="font-mono font-bold text-slate-900">&bull;&bull;&bull;&bull; {order.paymentDetails.cardLast4} ({order.paymentDetails.cardBrand || 'Card'})</span>
+                    </div>
+                  )}
+
+                  <div className="pt-1 text-[11px] font-medium text-emerald-800">
+                    {order.paymentMethod?.includes('Cash') 
+                      ? '• Pay cash in Pakistani Rupees when rider delivers your package.' 
+                      : '• Online payment recorded. Our pharmacist will verify upon dispatch.'}
+                  </div>
+                </div>
               </div>
               <div className="soft-inset p-5"><div className="flex items-start gap-3"><Truck className="mt-0.5 h-5 w-5 shrink-0 text-teal-600" /><p className="text-sm font-bold text-slate-800">Expected delivery within 45 minutes</p></div><div className="mt-3 flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" /><p className="text-sm text-slate-600">Our pharmacist will verify prescription items before dispatch.</p></div><div className="mt-3 flex items-start gap-3"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-teal-600" /><p className="text-sm text-slate-600">Delivering to {order.city}</p></div><div className="mt-3 flex items-start gap-3"><Phone className="mt-0.5 h-5 w-5 shrink-0 text-teal-600" /><p className="text-sm text-slate-600">Rider will contact you at {order.phone}</p></div></div>
             </aside>

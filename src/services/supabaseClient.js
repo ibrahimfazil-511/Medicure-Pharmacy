@@ -45,20 +45,26 @@ export function getSupabase() {
   return supabaseInstance;
 }
 
-export async function sendOrderEmail(orderId) {
+export async function sendOrderEmail(orderId, orderDetails = null) {
   try {
+    const payload = { orderId };
+    if (orderDetails) {
+      payload.order = orderDetails;
+    }
+
     const { data, error } = await getSupabase().functions.invoke('send-order-email', {
-      body: { orderId }
+      body: payload
     });
 
     if (error) {
-      console.error('[Supabase Error] Order email failed:', error);
+      console.warn('[Order Confirmation Email Warning]:', error.message || error);
       return { success: false, error: error.message || 'Order email failed' };
     }
 
+    console.log('[Order Confirmation Email] Confirmation email automatically dispatched for order #' + orderId, data);
     return { success: true, data };
   } catch (err) {
-    console.error('[Supabase Catch Error] Order email exception:', err);
+    console.warn('[Order Confirmation Email Exception]:', err.message);
     return { success: false, error: err.message || 'Order email failed' };
   }
 }
@@ -112,7 +118,7 @@ export async function fetchMedicines() {
       console.log('Supabase table empty or offline. Using local catalog dataset.');
       return { data: INITIAL_MEDICINES, source: 'Local Storage / Demo Sync' };
     }
-    
+
     const mapped = data.map(mapMedicineRow);
 
     return { data: mapped, source: 'Supabase Cloud Database' };
@@ -146,7 +152,7 @@ export async function fetchMedicineByIdOrSlug(idOrSlug) {
   const term = decodeURIComponent(String(idOrSlug)).trim().toLowerCase();
 
   // 1. Try local catalog / INITIAL_MEDICINES first for instant match
-  const localMatch = INITIAL_MEDICINES.find((m) => 
+  const localMatch = INITIAL_MEDICINES.find((m) =>
     String(m.id).toLowerCase() === term ||
     m.name.toLowerCase() === term ||
     m.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === term
@@ -322,7 +328,7 @@ export async function fetchMedicineReviews(medicineId, limit = 20) {
 export async function seedSupabaseMedicines() {
   try {
     const client = getSupabase();
-    
+
     const rowsToInsert = INITIAL_MEDICINES.map(m => ({
       id: m.id,
       name: m.name,
@@ -370,7 +376,7 @@ export async function savePrescription(prescription, fileObj) {
 
     if (fileObj) {
       const filePath = `prescriptions/${prescription.id}_${fileObj.name}`;
-      
+
       const { data: uploadData, error: uploadError } = await client.storage
         .from('prescriptions-bucket')
         .upload(filePath, fileObj);
@@ -383,7 +389,7 @@ export async function savePrescription(prescription, fileObj) {
       const { data: publicURLData } = client.storage
         .from('prescriptions-bucket')
         .getPublicUrl(filePath);
-      
+
       fileUrl = publicURLData.publicUrl;
     }
 
@@ -421,22 +427,23 @@ export async function saveOrder(order) {
     const hasValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail);
     const hasValidPhone = phone.replace(/\D/g, '').length >= 10;
     const orderStatus = hasValidPhone || hasValidEmail ? 'Pending' : 'Cancelled';
-    
+
     const itemsPayload = {
-      cart: Array.isArray(order.items) 
+      cart: Array.isArray(order.items)
         ? order.items.map(item => ({
-            id: item.medicine?.id || item.id,
-            name: item.medicine?.name || item.name,
-            formula: item.medicine?.formula || item.formula || '',
-            price: Number(item.medicine?.price || item.price || 0),
-            quantity: Number(item.quantity || 1)
-          }))
+          id: item.medicine?.id || item.id,
+          name: item.medicine?.name || item.name,
+          formula: item.medicine?.formula || item.formula || '',
+          price: Number(item.medicine?.price || item.price || 0),
+          quantity: Number(item.quantity || 1)
+        }))
         : [],
       shipping: {
         phone,
         address: order.shippingAddress || order.address || '',
         city: order.city || 'Lahore',
         payment_method: order.paymentMethod || 'Cash on Delivery',
+        payment_details: order.paymentDetails || null,
         tracking_code: order.trackingId || null,
         prescription_id: order.prescriptionId || null,
         subtotal: Number(order.subtotal || 0),
@@ -452,22 +459,27 @@ export async function saveOrder(order) {
       status: orderStatus
     };
 
-    const { data, error } = await client
-      .from('orders')
-      .insert([insertPayload])
-      .select()
-      .single();
+    const { data, error } = await client.rpc('place_order_atomic_v2', {
+      p_customer_name: insertPayload.customer_name,
+      p_customer_email: insertPayload.customer_email,
+      p_total_amount: insertPayload.total_amount,
+      p_items: insertPayload.items,
+      p_status: insertPayload.status
+    });
 
     if (error) {
-      console.error('[Supabase Error] Orders insert failed:', error);
-      return { success: false, error: error.message || error };
+      console.error('[Supabase Error] Atomic order placement failed:', error);
+      return { success: false, error: error.message || 'Could not place order.' };
     }
 
-    return { 
-      success: true, 
-      order: data, 
-      id: data.id, 
-      trackingId: order.trackingId || `MED-${data.id}` 
+    const savedOrder = Array.isArray(data) ? data[0] : data;
+    if (!savedOrder) return { success: false, error: 'Could not place order.' };
+
+    return {
+      success: true,
+      order: savedOrder,
+      id: savedOrder.id,
+      trackingId: order.trackingId || `MED-${savedOrder.id}`
     };
   } catch (err) {
     console.error('[Supabase Catch Error] Exception in saveOrder:', err);

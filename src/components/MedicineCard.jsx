@@ -9,6 +9,10 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView, alter
   const discount = Math.max(0, Number(medicine.discount) || 0);
   const price = Number(medicine.price) || 0;
   const originalPrice = Number(medicine.originalPrice) || 0;
+  const hasStockValue = medicine.stock !== null
+    && medicine.stock !== undefined
+    && medicine.stock !== '';
+  const stock = hasStockValue ? Number(medicine.stock) : Infinity;
   const hasDiscount = discount > 0 || originalPrice > price;
 
   const ratingValue = Number(medicine.rating) || 0;
@@ -88,7 +92,7 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView, alter
           <p className="mt-1 text-[11px] sm:text-xs text-slate-600 line-clamp-1 font-medium">
             {medicine.formula || 'Pharmacy product'}
           </p>
-          {Number(medicine.stock) <= 0 && alternatives.length > 0 && (
+          {stock <= 0 && alternatives.length > 0 && (
             <p className="mt-1 text-[10px] font-bold text-amber-700">
               Alternative: {alternatives[0].name}
             </p>
@@ -115,9 +119,9 @@ export default function MedicineCard({ medicine, onAddToCart, onQuickView, alter
             aria-label={`Add ${medicine.name} to cart`}
             onClick={(e) => {
               e.stopPropagation();
-              if (Number(medicine.stock) > 0) onAddToCart?.(medicine);
+              if (stock > 0) onAddToCart?.(medicine);
             }}
-            disabled={Number(medicine.stock) <= 0}
+            disabled={stock <= 0}
             className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white shadow-sm hover:bg-teal-700 active:scale-95 transition disabled:cursor-not-allowed disabled:bg-slate-300"
           >
             <ShoppingCart className="h-3.5 w-3.5" />
